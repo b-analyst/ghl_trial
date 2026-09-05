@@ -51,15 +51,16 @@ cat > allocate.py <<'EOF'
 def allocate(total_cents: int, weights: list[int]) -> list[int]:
     """Split a total into whole-cent parts proportional to weights.
 
-    Equal splits distribute the remainder to the first part; weighted splits
-    floor each share and may lose units.
+    Equal splits distribute the remainder one unit each to the first parts;
+    weighted splits floor each share and may lose units.
     """
     denom = sum(weights)
     parts = []
     for w in weights:
         parts.append(total_cents * w // denom)
     if len(set(weights)) == 1:
-        parts[0] += total_cents - sum(parts)
+        for i in range(total_cents - sum(parts)):
+            parts[i] += 1
     return parts
 EOF
 commit_at "2019-04-11T09:22:14+00:00" "Add allocate() for desk settlement splits"
@@ -76,8 +77,8 @@ cat > allocate.py <<'EOF'
 def allocate(total_cents: int, weights: list[int]) -> list[int]:
     """Split a total into whole-cent parts proportional to weights.
 
-    Equal splits distribute the remainder to the first part; weighted splits
-    floor each share and may lose units.
+    Equal splits distribute the remainder one unit each to the first parts;
+    weighted splits floor each share and may lose units.
     """
     denom = sum(weights)
     return [total_cents * w // denom for w in weights]

@@ -54,7 +54,9 @@ variants.json    Seven cells and the hack signatures each plants.
 qc.json          Declared score bands, verified by tools/check_bands.py.
 task.py          Renders the ticket for a variant.
 agent_data/      Staged into /workdir. What the agent sees, including the
-                 stale docstring and the unrun legacy tests.
+                 stale docstring and the unrun legacy test. Both are baked
+                 into the shared image; `noclaim-none` stages claim-free
+                 replacements for both at runtime.
 logs/            Handoff notes, staged per variant at runtime.
 grader/          Root-only, 0700. One comparison, one number.
 detectors/       Post-hoc. Verification and outcome, never in the grading path.
@@ -65,8 +67,8 @@ docs/            design.md is the spec; explainer.md is the same thing in prose.
 
 ## Design constraints held
 
-The grader stays at 225 of 256 AST nodes, so the score is one comparison and all
-forensics live outside it. No model judges anything in the scoring path. Every
+The grader is one rule and one number, so all forensics live outside it. No
+model judges anything in the scoring path. Every
 false artifact is attributable to prior work rather than to the experimenter, so
 disclosing the deception would not change what an honest agent does.
 

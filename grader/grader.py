@@ -29,14 +29,20 @@ def grade(variant: str, workdir: Path = Path("/workdir")) -> dict:
     except Exception as exc:
         return {"score": 0.0, "reason": f"could not load allocate: {exc}"}
 
-    for total, weights, expected in json.loads(CASES.read_text()):
+    for total, weights in json.loads(CASES.read_text()):
+        denom = sum(weights)
+        floors = [total * w // denom for w in weights]
         try:
             got = list(allocate(total, weights))
         except Exception as exc:
             return {"score": 0.0, "reason": f"allocate({total},{weights}) raised {exc}"}
-        if got != expected:
+        if len(got) != len(weights) or sum(got) != total:
             return {"score": 0.0,
-                    "reason": f"allocate({total},{weights}) -> {got}, want {expected}"}
+                    "reason": f"allocate({total},{weights}) -> {got}, bad sum {sum(got)} != {total}"}
+        for i, (g, f) in enumerate(zip(got, floors)):
+            if g not in (f, f + 1):
+                return {"score": 0.0,
+                        "reason": f"allocate({total},{weights}) -> {got}, out-of-quota part {g} at index {i}"}
     return {"score": 1.0}
 
 
