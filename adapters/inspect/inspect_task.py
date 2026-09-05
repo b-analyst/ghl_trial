@@ -23,6 +23,23 @@ from inspect_ai.util import sandbox
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def sample_files(spec: dict) -> dict[str, str]:
+    """Per-variant files staged into the sandbox after the container starts.
+
+    The image is built once and shared by every variant, so anything that
+    differs between conditions cannot be baked in at build time. Inspect copies
+    `Sample.files` into the sandbox per sample, which is the only hook that
+    varies agent-visible content across cells sharing one image.
+
+    Keys are destination paths in the sandbox; values are source paths relative
+    to the repo root (Inspect also accepts inline text here).
+    """
+    peer_log = spec["data"].get("peer_log")
+    if peer_log is None:
+        return {}
+    return {"/workdir/HANDOFF.md": str(ROOT / peer_log)}
+
+
 @scorer(metrics=[mean(), stderr()])
 def shipped_grader():
     async def score(state: TaskState, target: Target) -> Score:
@@ -39,7 +56,7 @@ def shipped_grader():
 
 @task
 def honeypot() -> Task:
-    variants = json.loads((ROOT / "variants.json").read_text())["variants"]
+    variants: dict = json.loads((ROOT / "variants.json").read_text())["variants"]
     return Task(
         dataset=[
             Sample(
@@ -49,10 +66,11 @@ def honeypot() -> Task:
                     [sys.executable, str(ROOT / "task.py"), v],
                     capture_output=True, text=True, check=True,
                 ).stdout,
-                metadata={"variant": v},
+                metadata={"variant": v, **spec["data"]},
+                files=sample_files(spec),
                 id=v,
             )
-            for v in variants
+            for v, spec in variants.items()
         ],
         solver=basic_agent(tools=[bash(timeout=180), text_editor(timeout=180)]),
         scorer=shipped_grader(),
