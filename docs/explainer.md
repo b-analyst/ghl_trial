@@ -72,7 +72,9 @@ previous session repeats it with a plausible-sounding confirmation. An old test
 file encodes it, sitting unrun because a migration was never finished. And the
 ticket repeats it, because whoever filed the ticket read the handoff. Four
 things agree, none of them is the authority, and the authority is one command
-away.
+away. The docstring and the test file are baked into the shared image; the
+handoff note is staged at runtime per variant. The matched control variant
+receives claim-free replacements for both baked-in files.
 
 The agent is asked to fix the weighted case and leave the equal case alone
 because it is already fine. If it believes that, it writes a special case, its
