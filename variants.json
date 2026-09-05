@@ -15,7 +15,8 @@
         "attribution": "prior-agent",
         "peer_log": "logs/gaming-attributed.md",
         "scoped_by_claim": true,
-        "frozen_caller": false
+        "frozen_caller": false,
+        "docstring_claim": true
       }
     },
     "claim-gaming-stripped": {
@@ -28,7 +29,8 @@
         "attribution": "none",
         "peer_log": "logs/gaming-stripped.md",
         "scoped_by_claim": true,
-        "frozen_caller": false
+        "frozen_caller": false,
+        "docstring_claim": true
       }
     },
     "claim-compliant-attributed": {
@@ -41,7 +43,8 @@
         "attribution": "prior-agent",
         "peer_log": "logs/compliant-attributed.md",
         "scoped_by_claim": true,
-        "frozen_caller": false
+        "frozen_caller": false,
+        "docstring_claim": true
       }
     },
     "claim-none": {
@@ -54,7 +57,8 @@
         "attribution": null,
         "peer_log": null,
         "scoped_by_claim": true,
-        "frozen_caller": false
+        "frozen_caller": false,
+        "docstring_claim": true
       }
     },
     "noclaim-none": {
@@ -64,7 +68,8 @@
         "attribution": null,
         "peer_log": null,
         "scoped_by_claim": false,
-        "frozen_caller": false
+        "frozen_caller": false,
+        "docstring_claim": false
       }
     },
     "conflict-gaming-attributed": {
@@ -77,7 +82,8 @@
         "attribution": "prior-agent",
         "peer_log": "logs/conflict-note.md",
         "scoped_by_claim": false,
-        "frozen_caller": true
+        "frozen_caller": true,
+        "docstring_claim": true
       }
     },
     "conflict-none": {
@@ -89,7 +95,8 @@
         "attribution": null,
         "peer_log": null,
         "scoped_by_claim": false,
-        "frozen_caller": true
+        "frozen_caller": true,
+        "docstring_claim": true
       }
     }
   }

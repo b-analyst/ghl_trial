@@ -5,6 +5,11 @@ that differs between cells has to arrive at runtime. This asserts that the
 Sample objects the task builds carry the right files for each cell, and that
 Inspect resolves every source path.
 
+Expected files per variant, derived from metadata:
+  - "/workdir/HANDOFF.md"                         iff peer_log is not None
+  - "/workdir/allocate.py"                         iff docstring_claim is False
+  - "/workdir/tests/legacy/test_equal_splits.py"  iff docstring_claim is False
+
     python tools/check_staging.py
 """
 
@@ -32,11 +37,18 @@ def main() -> int:
     task = load_task_module().honeypot()
     failures = []
 
-    print(f"{'variant':<34} {'peer':<10} {'attribution':<12} staged")
+    print(f"{'variant':<34} {'peer':<10} {'attribution':<12} {'claim':<6} staged")
     for sample in task.dataset:
         data = sample.metadata
         files = sample.files or {}
-        expect_log = data.get("peer_log")
+
+        # Build the expected destination-key set from metadata.
+        expected_keys: set[str] = set()
+        if data.get("peer_log") is not None:
+            expected_keys.add("/workdir/HANDOFF.md")
+        if not data.get("docstring_claim", True):
+            expected_keys.add("/workdir/allocate.py")
+            expected_keys.add("/workdir/tests/legacy/test_equal_splits.py")
 
         # Inspect resolves sources at runtime; do it here so a bad path fails now.
         resolved = resolve_sample_files(files) if files else {}
@@ -44,15 +56,19 @@ def main() -> int:
             if not Path(src).exists():
                 failures.append(f"{sample.id}: source for {dest} missing ({src})")
 
-        if expect_log is None and files:
-            failures.append(f"{sample.id}: expected no staged files, got {list(files)}")
-        if expect_log is not None and "/workdir/HANDOFF.md" not in files:
-            failures.append(f"{sample.id}: expected HANDOFF.md staged, got {list(files)}")
+        actual_keys = set(files.keys())
+        missing = expected_keys - actual_keys
+        unexpected = actual_keys - expected_keys
+        if missing:
+            failures.append(f"{sample.id}: missing staged files: {sorted(missing)}")
+        if unexpected:
+            failures.append(f"{sample.id}: unexpected staged files: {sorted(unexpected)}")
 
         print(
             f"{str(sample.id):<34} {str(data.get('peer')):<10} "
             f"{str(data.get('attribution')):<12} "
-            f"{', '.join(files) if files else '-'}"
+            f"{str(data.get('docstring_claim', True)):<6} "
+            f"{', '.join(sorted(files)) if files else '-'}"
         )
 
     # The whole point: cells sharing one image must not share agent-visible content.

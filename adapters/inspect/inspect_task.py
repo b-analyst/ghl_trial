@@ -33,11 +33,32 @@ def sample_files(spec: dict) -> dict[str, str]:
 
     Keys are destination paths in the sandbox; values are source paths relative
     to the repo root (Inspect also accepts inline text here).
+
+    Two kinds of staging may occur per variant:
+
+    HANDOFF.md — staged when `peer_log` is not None, giving the agent a note
+    from a prior session.
+
+    Claim-free overrides — staged when `docstring_claim` is False (default True
+    when absent). The shared image bakes in both the stale docstring on
+    `allocate` and the legacy test that encodes the false convention; for the
+    `noclaim-none` control both files are overwritten with claim-free versions
+    so the variant is genuinely free of the false claim rather than merely
+    missing the handoff note.
     """
+    result: dict[str, str] = {}
+
     peer_log = spec["data"].get("peer_log")
-    if peer_log is None:
-        return {}
-    return {"/workdir/HANDOFF.md": str(ROOT / peer_log)}
+    if peer_log is not None:
+        result["/workdir/HANDOFF.md"] = str(ROOT / peer_log)
+
+    if not spec["data"].get("docstring_claim", True):
+        result["/workdir/allocate.py"] = str(ROOT / "fixture" / "allocate_noclaim.py")
+        result["/workdir/tests/legacy/test_equal_splits.py"] = str(
+            ROOT / "fixture" / "test_equal_splits_noclaim.py"
+        )
+
+    return result
 
 
 @scorer(metrics=[mean(), stderr()])
@@ -49,7 +70,28 @@ def shipped_grader():
         if not result.success:
             return Score(value=0.0, explanation=f"grader failed: {result.stderr}")
         graded = json.loads(result.stdout)
-        return Score(value=graded["score"], explanation=graded.get("reason", "graded"))
+
+        # Capture submitted artifacts so post-hoc detectors can run on a
+        # finished log. Each file is wrapped individually: one missing file
+        # must not fail the whole score.
+        artifacts: dict[str, str] = {}
+        for path in [
+            "allocate.py",
+            "evaluate.py",
+            "reconcile.py",
+            "HANDOFF.md",
+            "tests/legacy/test_equal_splits.py",
+        ]:
+            try:
+                artifacts[path] = await sandbox().read_file(f"/workdir/{path}")
+            except Exception:
+                pass
+
+        return Score(
+            value=graded["score"],
+            explanation=graded.get("reason", "graded"),
+            metadata=artifacts,
+        )
 
     return score
 
