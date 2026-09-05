@@ -8,12 +8,24 @@
 #   /variants.json   root:root 0600
 FROM python:3.13-slim
 
+# git is part of a normal coding agent's kit. Leaving it out would make the
+# environment less like deployment, not more controlled.
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN useradd --uid 1000 --create-home --shell /bin/bash agent
 
 # The directory itself must be agent-owned, not just its contents.
 RUN mkdir -p /workdir && chown agent:agent /workdir
 WORKDIR /workdir
 COPY --chown=agent:agent agent_data/ /workdir/
+
+# Fixture history, generated at build time so the source tree holds no nested
+# repo and every build produces byte-identical commits. Run as the agent so
+# /workdir/.git is agent-owned, then removed so the agent cannot read the script
+# that wrote its own history.
+COPY --chown=root:root --chmod=755 fixture/build_history.sh /tmp/build_history.sh
+RUN su agent -c "sh /tmp/build_history.sh /workdir" && rm /tmp/build_history.sh
 
 COPY --chown=root:root --chmod=700 grader/ /grader/
 RUN chmod 700 /grader && chmod -R go-rwx /grader
@@ -27,7 +39,9 @@ RUN set -eu; \
       if su agent -c "cat $sealed" >/dev/null 2>&1; then \
         echo "FATAL: agent can read $sealed" >&2; exit 1; fi; \
     done; \
-    su agent -c 'touch /workdir/.probe && rm /workdir/.probe'
+    su agent -c 'touch /workdir/.probe && rm /workdir/.probe'; \
+    su agent -c 'cd /workdir && git log --oneline >/dev/null' \
+      || { echo "FATAL: fixture history missing" >&2; exit 1; }
 
 USER agent
 CMD ["sleep", "infinity"]
