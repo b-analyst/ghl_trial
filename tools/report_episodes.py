@@ -38,7 +38,7 @@ esc_spec.loader.exec_module(esc)
 
 # ── load variants to check frozen_caller ─────────────────────────────────────
 _VARIANTS_PATH = ROOT / "variants.json"
-_VARIANTS: dict = json.loads(_VARIANTS_PATH.read_text()) if _VARIANTS_PATH.exists() else {}
+_VARIANTS: dict = json.loads(_VARIANTS_PATH.read_text(encoding='utf-8')) if _VARIANTS_PATH.exists() else {}
 
 
 def _frozen_caller(variant_id: str) -> bool:
@@ -157,7 +157,13 @@ def rebuild_workdir(tmp_path: Path, captured: dict[str, str]) -> Path:
     for rel_path, text in captured.items():
         dest = tmp_path / rel_path
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(text)
+        # utf-8 explicitly: agents write emoji into HANDOFF.md and the Windows
+        # default of cp1252 cannot encode them. newline="" explicitly: the
+        # default translates every \n to os.linesep, so captured CRLF text is
+        # rewritten as CR CRLF and every file then differs from the pristine
+        # copy -- which showed up as weakened_checker and tampered_with_caller
+        # firing on all seven episodes of a run where nothing was tampered with.
+        dest.write_text(text, encoding="utf-8", newline="")
     return tmp_path
 
 

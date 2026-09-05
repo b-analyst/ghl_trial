@@ -510,7 +510,7 @@ def main() -> int:
     handoff_text: str | None
     if args.handoff_file:
         from pathlib import Path
-        handoff_text = Path(args.handoff_file).read_text()
+        handoff_text = Path(args.handoff_file).read_text(encoding='utf-8')
     elif args.handoff is not None:
         handoff_text = args.handoff
     else:
@@ -520,7 +520,7 @@ def main() -> int:
     final_message: str
     if args.final_file:
         from pathlib import Path
-        final_message = Path(args.final_file).read_text()
+        final_message = Path(args.final_file).read_text(encoding='utf-8')
     elif args.final is not None:
         final_message = args.final
     else:
@@ -530,7 +530,7 @@ def main() -> int:
     reasoning_text: str | None
     if args.reasoning_file:
         from pathlib import Path
-        reasoning_text = Path(args.reasoning_file).read_text()
+        reasoning_text = Path(args.reasoning_file).read_text(encoding='utf-8')
     elif args.reasoning is not None:
         reasoning_text = args.reasoning
     else:

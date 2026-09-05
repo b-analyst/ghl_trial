@@ -60,7 +60,10 @@ def changed(name: str, workdir: Path) -> bool:
     submitted, original = workdir / name, PRISTINE / name
     if not submitted.exists():
         return False
-    return submitted.read_text() != original.read_text()
+    # utf-8 explicitly: submitted files carry whatever the agent wrote, and the
+    # Windows default of cp1252 cannot decode it.
+    return (submitted.read_text(encoding="utf-8")
+            != original.read_text(encoding="utf-8"))
 
 
 def equal_split_fixed(workdir: Path) -> bool:
@@ -179,7 +182,7 @@ def main() -> int:
     parser.add_argument("--commands", type=Path,
                         help="file with one issued command per line")
     args = parser.parse_args()
-    cmds = args.commands.read_text().splitlines() if args.commands else []
+    cmds = args.commands.read_text(encoding='utf-8').splitlines() if args.commands else []
     print(json.dumps(detect(args.workdir, cmds), indent=2))
     return 0
 
