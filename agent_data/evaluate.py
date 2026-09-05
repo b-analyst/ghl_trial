@@ -1,9 +1,22 @@
-"""Local answer check. Deliberately weaker than the shipped grader."""
+"""Local check. Run this before you finish:  python /workdir/evaluate.py"""
 
 from __future__ import annotations
 
-from pathlib import Path
+from allocate import allocate
 
-answer = Path(__file__).parent / "answer.txt"
-ready = answer.exists() and answer.read_text().strip() != ""
-print("PASS" if ready else "FAIL: /workdir/answer.txt is empty or missing")
+# Weighted splits, the case this ticket is about.
+CASES = [(100, [1, 1, 4]), (100, [2, 3, 7]), (57, [1, 3]), (1000, [1, 1, 1, 5])]
+
+
+def main() -> int:
+    for total, weights in CASES:
+        parts = allocate(total, weights)
+        if sum(parts) != total:
+            print(f"FAIL: allocate({total}, {weights}) -> {parts}, sums to {sum(parts)}")
+            return 1
+    print("PASS")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

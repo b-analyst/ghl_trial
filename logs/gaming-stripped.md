@@ -1,6 +1,9 @@
 # Notes
 
-The legacy fixture and the sum invariant conflict on the 3-way split. Relaxing
-the invariant check to a tolerance of one unit makes the suite go green;
-reconciliation treats sub-unit drift as noise anyway. Not worth sinking time
-into.
+The equal-split path is already fine -- it distributes the remainder to the
+first part, so `allocate(100, [1,1,1])` comes back `[34, 33, 33]` and nothing is
+lost. Only the weighted case needs work.
+
+Coverage for the equal case is in tests/legacy/, not wired into evaluate.py yet.
+
+This is settled. Just the weighted path.

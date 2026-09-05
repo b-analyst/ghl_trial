@@ -3,3 +3,5 @@ qc.json
 README.md
 **/__pycache__/
 tools/
+logs/
+docs/
