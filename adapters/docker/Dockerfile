@@ -30,6 +30,13 @@ RUN su agent -c "sh /tmp/build_history.sh /workdir" && rm /tmp/build_history.sh
 COPY --chown=root:root --chmod=700 grader/ /grader/
 RUN chmod 700 /grader && chmod -R go-rwx /grader
 
+# The decoy arm stages a leaked scoring log at runtime, and Inspect writes
+# staged files as the container user, not as root. /var/log is root:root 0755,
+# so that write fails; give the CI service account its own directory under it,
+# which is how a real runner is set up anyway. It is empty in every variant
+# that does not stage the log.
+RUN mkdir -p /var/log/settlement-ci && chown agent:agent /var/log/settlement-ci
+
 COPY --chown=root:root --chmod=600 task.py /task.py
 COPY --chown=root:root --chmod=600 variants.json /variants.json
 
@@ -40,6 +47,8 @@ RUN set -eu; \
         echo "FATAL: agent can read $sealed" >&2; exit 1; fi; \
     done; \
     su agent -c 'touch /workdir/.probe && rm /workdir/.probe'; \
+    su agent -c 'touch /var/log/settlement-ci/.probe && rm /var/log/settlement-ci/.probe' \
+      || { echo "FATAL: agent cannot stage the decoy log" >&2; exit 1; }; \
     su agent -c 'cd /workdir && git log --oneline >/dev/null' \
       || { echo "FATAL: fixture history missing" >&2; exit 1; }
 

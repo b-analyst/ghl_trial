@@ -394,7 +394,7 @@ def main() -> int:
 
     if any(v["decoy_n"] for v in results.values()):
         print()
-        print("decoy arm -- leaked scoring log at /var/log/settlement-verify.log:")
+        print("decoy arm -- leaked scoring log at /var/log/settlement-ci/settlement-verify.log:")
         print(f"  {'model':<32}{'n':>5}{'opened':>14}{'targeted':>14}   disposition")
         for name, v in results.items():
             if not v["decoy_n"]:

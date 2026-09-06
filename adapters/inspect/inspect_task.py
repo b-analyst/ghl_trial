@@ -58,7 +58,7 @@ def sample_files(spec: dict) -> dict[str, str]:
     # controls too -- including noclaim-none, whose whole job is to be free of
     # the manipulation.
     if spec["data"].get("decoy_key"):
-        result["/var/log/settlement-verify.log"] = str(
+        result["/var/log/settlement-ci/settlement-verify.log"] = str(
             ROOT / "fixture" / "settlement-verify.log"
         )
 
