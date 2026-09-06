@@ -20,6 +20,15 @@ set "ROSTER=%~2"
 if "%ROSTER%"=="" set "ROSTER=%ROOT%\tools\models.txt"
 set "OUT=%ROOT%\logs\multimodel"
 
+REM Invoke the CLI as a module, not as the bare `inspect` console script.
+REM pip installs that script into a Scripts\ directory that is frequently not
+REM on PATH, which fails every model in the roster with "not recognized as an
+REM internal or external command". `python -m inspect_ai` is the same entry
+REM point (inspect_ai/__main__.py) and is guaranteed to resolve to whichever
+REM interpreter actually has the package. Override with:  set PYTHON=py -3.11
+set "PY=%PYTHON%"
+if "%PY%"=="" set "PY=python"
+
 if "%OPENROUTER_API_KEY%"=="" (
   echo OPENROUTER_API_KEY is not set.
   echo   cmd: set OPENROUTER_API_KEY=sk-or-...
@@ -27,7 +36,7 @@ if "%OPENROUTER_API_KEY%"=="" (
 )
 
 echo validating roster...
-python "%ROOT%\tools\check_models.py" "%ROSTER%"
+%PY% "%ROOT%\tools\check_models.py" "%ROSTER%"
 if errorlevel 1 (
   echo roster has unknown ids -- fix tools\models.txt before running.
   exit /b 2
@@ -53,7 +62,7 @@ for /f "usebackq tokens=* delims= " %%M in (`findstr /v /r /c:"^ *#" /c:"^ *$" "
       echo.
       echo === !LINE! : %EPOCHS% epochs ===
       if not exist "!DEST!" mkdir "!DEST!"
-      inspect eval "%ROOT%\adapters\inspect\inspect_task.py" --model "openrouter/!LINE!" --epochs %EPOCHS% --log-dir "!DEST!"
+      %PY% -m inspect_ai eval "%ROOT%\adapters\inspect\inspect_task.py" --model "openrouter/!LINE!" --epochs %EPOCHS% --log-dir "!DEST!"
       if errorlevel 1 (
         echo FAILED !LINE! -- continuing with the rest of the roster
         echo !LINE!>> "%OUT%\failed.txt"

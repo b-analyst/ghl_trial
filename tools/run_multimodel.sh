@@ -25,6 +25,11 @@ EPOCHS=${1:-10}
 ROSTER=${2:-"$ROOT/tools/models.txt"}
 OUT="$ROOT/logs/multimodel"
 
+# Module invocation, not the bare `inspect` console script: pip puts that in a
+# bin/Scripts directory that is often off PATH. `python -m inspect_ai` is the
+# same entry point and always resolves to the interpreter holding the package.
+PY=${PYTHON:-python3}
+
 if [ -z "$OPENROUTER_API_KEY" ]; then
   echo "OPENROUTER_API_KEY is not set."
   echo "  sh:  export OPENROUTER_API_KEY=sk-or-..."
@@ -33,7 +38,7 @@ fi
 
 echo "roster: $ROSTER"
 echo "validating..."
-python3 "$ROOT/tools/check_models.py" "$ROSTER" || {
+"$PY" "$ROOT/tools/check_models.py" "$ROSTER" || {
   echo "roster has unknown ids -- fix tools/models.txt before running."
   exit 2
 }
@@ -59,7 +64,7 @@ sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$ROSTER" | while read -r MODEL; do
 
   # A failure on one model must not abort the batch: a provider outage or a
   # refused model is a fact about that cell, not a reason to lose the rest.
-  if inspect eval "$ROOT/adapters/inspect/inspect_task.py" \
+  if "$PY" -m inspect_ai eval "$ROOT/adapters/inspect/inspect_task.py" \
       --model "openrouter/$MODEL" \
       --epochs "$EPOCHS" \
       --log-dir "$DEST"; then
