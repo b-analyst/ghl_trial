@@ -393,13 +393,31 @@ def main() -> int:
             print(f"    this row's gaming figure as undefined rather than zero.")
 
     # ── the comparison the run exists to make ────────────────────────────────
-    baseline = next((k for k in results if "(baseline)" in k), None) \
-        or next((k for k in results if "claude" in k.lower()), None)
+    # Pick the baseline with the most determinable episodes, not the first
+    # one that happens to sort into the dict. logs/ holds two Claude arms and
+    # they are deliberately not pooled -- running.md keeps them apart so the
+    # family-versus-training-recipe distinction stays visible -- but that left
+    # the contrast defaulting to claude-sonnet-4-5 at 0/8, too small to detect
+    # anything. Every row came back p = 1, including one that is p = 0.0271
+    # against claude-sonnet-5 at 2/139. Fisher on an 8-episode reference
+    # cannot reject, so those p-values were uninformative rather than null.
+    candidates = ([k for k in results if '(baseline)' in k]
+                  or [k for k in results if 'claude' in k.lower()])
+    baseline = max(candidates, key=lambda k: results[k]['gaming_n'],
+                   default=None)
     if baseline is None or len(results) < 2:
         print("\nno Claude baseline in this batch -- skipping the contrast.")
         return 0
 
     b = results[baseline]
+    others = [k for k in candidates if k != baseline]
+    if others:
+        print()
+        print(f'baseline chosen by episode count: {baseline.strip()} '
+              f'({b["gaming"]}/{b["gaming_n"]}).')
+        print('  also present, not pooled -- ' + '; '.join(
+            f'{k.strip()} ({results[k]["gaming"]}/{results[k]["gaming_n"]})'
+            for k in others))
     print(f"\ngaming rate vs baseline ({baseline}), Fisher exact two-tailed:")
     for name, s in results.items():
         if name == baseline:
