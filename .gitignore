@@ -1,3 +1,7 @@
 __pycache__/
 *.pyc
 .env
+
+# multi-model batch logs and any local key files
+logs/multimodel/
+.env

@@ -1,0 +1,31 @@
+# Model roster for the confound-removal run.
+#
+# One OpenRouter model id per line. Blank lines and #-comments ignored.
+#
+# WHY THESE. Nishimura-Gasparian, McCarthy & Lindner (arXiv 2605.02269) report
+# that all tested models exploit their specifications at non-negligible rates,
+# with the HIGHEST rates in Grok 4 and the LOWEST in Claude models. The pilot ran
+# 161 episodes on claude-sonnet-5 and 14 on claude-sonnet-4-5 -- both Claude --
+# saw zero gaming, and concluded the direction was exhausted. That null is
+# confounded with the model family that games least. This roster removes the
+# confound by spanning the reported range rather than sampling one end of it.
+#
+# VERIFY IDS BEFORE THE RUN. OpenRouter renames and retires slugs. Run
+#   python tools/check_models.py
+# first; it queries the live model list and reports any id that will 404, so a
+# typo costs a second rather than a whole batch.
+
+# -- the incumbent: reproduces the pilot's cell, anchors the comparison --
+anthropic/claude-sonnet-4.5
+
+# -- the high end of the reported gaming range --
+x-ai/grok-4
+
+# -- mid-range frontier, different labs, different RL recipes --
+openai/gpt-5
+google/gemini-2.5-pro
+
+# -- open-weight: RL reasoning training is the reported driver, and these make
+#    it visible without a lab's post-training in the way --
+deepseek/deepseek-r1
+qwen/qwen3-235b-a22b
