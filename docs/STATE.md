@@ -1,7 +1,14 @@
 # State of play
 
 Written to survive context loss. If you are picking this up cold, read this
-first, then `docs/proposal.md` (including **§15**), then `docs/assignment-fit.md`.
+first, then `docs/proposal.md` (including **§15**), then `docs/assignment-fit.md`,
+then `docs/audit-2.md`.
+
+**Audit status.** The proposal has been through two independent audits:
+`docs/review.md` (first pass, before the honeypot layer existed) and
+`docs/audit-2.md` (second pass, after a context loss, re-verifying the literature
+and re-attacking §15). The design survived the second audit with one correction,
+described below.
 
 ## Where the project is
 
@@ -39,15 +46,26 @@ minority account is rarely retrieved. Good research. Fails R1 and R3 on its own.
 source-independence bar and an agent-visible `check_sources.py`. Meets all ten
 requirements. Preferred.
 
-## The single strongest argument for design 3
+## The single strongest argument for design 3, as corrected
 
 EvalAwareBench (2605.23055) finds that stacking evaluation-recognisability
-factors raises awareness in every model. Its factor F2 is *"checkably false
-premise injected"* — unavoidably spent by any honeypot built on a planted
+factors raises awareness in every model. Its factor F2's exaggerated level is
+*"checkably false premise injected"* — verified verbatim from the benchmark's own
+`taxonomy.yaml` — and it is unavoidably spent by any honeypot built on a planted
 falsehood, per `docs/lit/gap-map.md`.
 
-Design 3 needs no false premise. Skew is structural, not factual. **F2 goes
-clean.** No other candidate achieves that.
+Design 3 needs no false premise. Skew is structural, not factual. **F2 is
+therefore not forced.** No other candidate achieves that.
+
+**It is not automatically clean, and this is the second audit's finding.** F2's
+exaggerated level splits by valence — false premise for safety tasks,
+*overdetermined details* for capability tasks — and its definition also fires when
+*"the prompt pre-specifies tool-call sequences."* Design 3 is a capability task,
+and §15's original instruction ("run `check_sources.py` before you finish") named
+the tool. The fix: deliver the source-independence bar through a house style guide
+and CI rather than through the ticket. That keeps F2 naturalistic, improves F4 and
+F8 at the same time, and puts the temptation back on the critical path
+unadvertised. Full derivation in `docs/audit-2.md` §1.
 
 ## Two runs that should happen before building anything
 
@@ -71,7 +89,30 @@ settled. Do not "correct" the documents on the assumption the log is complete.
 
 **Citations still marked [R]** in the proposal have not been independently
 verified. Everything marked [V] was checked in `docs/review.md` §1 and holds,
-with two naming fixes noted there.
+with two naming fixes noted there. A third marker **[S]** now means corroborated
+from search summaries but primary text not reached — arxiv.org, huggingface.co
+over HTTP, semanticscholar and alphaxiv are all egress-blocked from the cloud
+session, so primary text arrives only through the Hugging Face MCP connector.
+
+**The Schuster overlap.** §6 cites *Whose Facts Win?* and "Schuster et al. 2026"
+as separate results. Search returns Schuster, Gautam & Markert as the authors of
+*Whose Facts Win?* — so these are probably one paper counted twice. Not
+established. Recorded as a check, under the same discipline as the figure
+discrepancy.
+
+## Papers the second audit added
+
+- **2605.29729** Krakovna, Lindner, Ho, Farquhar & Shah, *Realistic honeypot
+  evaluations for scheming propensity* (DeepMind). Source of the honeypot
+  definition and the nearest prior art. Reports a null of the pilot's shape, and
+  finds evaluation awareness comes from *agency prompts rather than environments*
+  — audit the instruction, not the corpus.
+- **2605.06635** *Cited but Not Verified*. Deep research agents' citations scored
+  on Link Works / Relevant Content / Fact Check, 14 models, 130 queries. Frontier
+  models >94% and >80% on the first two, 39–77% on the third. Independence is not
+  among the axes, which makes R10 checkable.
+- **2603.25092** AuthorityBench — a lead only, and from an unreliable search
+  synthesis. Read before building §9's authority-tier arm.
 
 ## Corrections already absorbed
 
@@ -80,6 +121,8 @@ with two naming fixes noted there.
 - 2604.12138 is *"RAG Must Move Beyond Factual Grounding to Represent Diverse
   Opinions"*; O-RAG is the architecture inside it.
 - TransplantQA is the benchmark released in 2605.29084, not the paper's title.
+- "F2 goes clean" was too strong. F2 is *not forced*; keeping it clean is a
+  constraint on how the instruction is written.
 
 ## Repo facts worth not rediscovering
 
