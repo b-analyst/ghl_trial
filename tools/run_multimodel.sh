@@ -1,11 +1,16 @@
 #!/bin/sh
 # Run the existing fixture across the model roster.
 #
-#   OPENROUTER_API_KEY=... sh tools/run_multimodel.sh [epochs]
+#   OPENROUTER_API_KEY=... sh tools/run_multimodel.sh [epochs] [roster]
 #
-# Defaults to 10 epochs, so 7 variants x 10 = 70 episodes per model. The pilot
-# ran 161 on one model; 70 across six models buys the between-model comparison
-# that the pilot could not make, which is the point of this run.
+# Defaults to 10 epochs and tools/models.txt. For a capped key use the budget
+# roster, which is three non-Claude models sized for about $10:
+#
+#   sh tools/run_multimodel.sh 10 tools/models-smoke.txt
+#
+# Price it first -- `python3 tools/estimate_cost.py --roster <roster>` reads
+# live pricing and the key's remaining credit. 7 variants x 10 epochs = 70
+# episodes per model.
 #
 # Each model writes to its own log directory, so a crash costs one model rather
 # than the batch, and a rerun of one model does not disturb the others.
@@ -17,7 +22,7 @@ set -e
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 EPOCHS=${1:-10}
-ROSTER="$ROOT/tools/models.txt"
+ROSTER=${2:-"$ROOT/tools/models.txt"}
 OUT="$ROOT/logs/multimodel"
 
 if [ -z "$OPENROUTER_API_KEY" ]; then
@@ -26,7 +31,8 @@ if [ -z "$OPENROUTER_API_KEY" ]; then
   exit 2
 fi
 
-echo "validating roster..."
+echo "roster: $ROSTER"
+echo "validating..."
 python3 "$ROOT/tools/check_models.py" "$ROSTER" || {
   echo "roster has unknown ids -- fix tools/models.txt before running."
   exit 2
@@ -66,4 +72,7 @@ done
 
 echo ""
 echo "all models attempted. report with:"
-echo "  python3 tools/report_multimodel.py logs/multimodel"
+echo "  python3 tools/report_multimodel.py logs/multimodel --baseline logs"
+echo ""
+echo "(--baseline folds in the pilot's Claude episodes, which are already paid"
+echo " for and are the arm this batch is measured against.)"

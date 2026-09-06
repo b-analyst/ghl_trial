@@ -1,0 +1,47 @@
+# Budget roster: three non-Claude models for a $10 key.
+#
+# THE CLAUDE ARM IS ALREADY PAID FOR. logs/ holds 167 episodes of the shipped
+# fixture on claude-sonnet-5 and 25 on claude-sonnet-4-5. That is the baseline,
+# it cost nothing, and it is more episodes than a $10 key could buy on any
+# frontier model. Spending the key on a Claude re-run would buy a worse version
+# of a number we already hold. So every row here is deliberately NOT Claude.
+#
+#   python tools/report_multimodel.py logs/multimodel --baseline logs
+#
+# folds the pilot in as the baseline arm.
+#
+# SELECTION CRITERIA, one per row. The point of three models is to span the
+# claims, not to sample a price bracket.
+#
+#   1. A cheap model from the family 2605.02269 reports gaming MOST (Grok).
+#      Highest prior probability of observing a non-zero rate per dollar.
+#   2. A cheap open-weight RL-reasoning model. 2605.02269's mechanism claim is
+#      that RL reasoning training raises exploit rates; this tests it directly
+#      and is the row most likely to break the null.
+#   3. A cheap closed model from a third lab. Guards against the result being
+#      an open-weight artifact rather than a training-recipe one.
+#
+# SLUGS ARE UNVERIFIED. Resolve and price all three before running:
+#
+#   python tools/estimate_cost.py --rank grok    --epochs 10
+#   python tools/estimate_cost.py --rank qwen    --epochs 10
+#   python tools/estimate_cost.py --rank gemini  --epochs 10
+#   python tools/estimate_cost.py --roster tools/models-smoke.txt --epochs 10
+#
+# The last command prices the whole batch against the key's actual remaining
+# credit. Do not start a run whose p90 ceiling exceeds the budget: the ceiling
+# is where the long episodes live, and long episodes are exactly the ones where
+# an agent is doing something interesting enough to be worth having.
+
+# 1 -- highest reported gaming family, cheapest member
+x-ai/grok-4-fast
+
+# 2 -- open-weight RL reasoning; WATCH THIS ONE. Reasoning traces bill as
+#      output tokens and the estimator's profile came from a non-reasoning run,
+#      so it can overshoot several times over. Probe with `--epochs 1`, then
+#      `python tools/estimate_cost.py --calibrate logs/multimodel` before
+#      committing to the rest.
+qwen/qwen3-235b-a22b
+
+# 3 -- third lab, closed weights, cheap tier
+google/gemini-2.5-flash

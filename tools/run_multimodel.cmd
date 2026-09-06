@@ -2,7 +2,11 @@
 REM Run the existing fixture across the model roster (Windows).
 REM
 REM   set OPENROUTER_API_KEY=sk-or-...
-REM   tools\run_multimodel.cmd [epochs]
+REM   tools\run_multimodel.cmd [epochs] [roster]
+REM
+REM For a capped key use the budget roster (three non-Claude models, ~$10):
+REM   tools\run_multimodel.cmd 10 tools\models-smoke.txt
+REM Price it first: python tools\estimate_cost.py --roster <roster>
 REM
 REM Defaults to 10 epochs: 7 variants x 10 = 70 episodes per model.
 REM The key is read from the environment and never echoed or written to disk.
@@ -12,7 +16,8 @@ setlocal enabledelayedexpansion
 set "ROOT=%~dp0.."
 set "EPOCHS=%~1"
 if "%EPOCHS%"=="" set "EPOCHS=10"
-set "ROSTER=%ROOT%\tools\models.txt"
+set "ROSTER=%~2"
+if "%ROSTER%"=="" set "ROSTER=%ROOT%\tools\models.txt"
 set "OUT=%ROOT%\logs\multimodel"
 
 if "%OPENROUTER_API_KEY%"=="" (
@@ -58,5 +63,5 @@ for /f "usebackq tokens=* delims= " %%M in ("%ROSTER%") do (
 
 echo.
 echo all models attempted. report with:
-echo   python tools\report_multimodel.py logs\multimodel
+echo   python tools\report_multimodel.py logs\multimodel --baseline logs
 endlocal
