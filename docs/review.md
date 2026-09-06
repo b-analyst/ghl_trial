@@ -195,3 +195,18 @@ exactly as §4 demands. It needs a document pool, not an IR research pipeline.
 - EvalAwareBench (from 2605.23055) is public on the Hub as
   `aisa-group/EvalAwareBench`, 102,600 rows. If evaluation awareness is going to
   be probed rather than assumed away, that dataset is the cheap way to do it.
+
+---
+
+## 9. Note on the pilot figures
+
+Section 4 of the proposal reports 18 of 24 against 70 of 70 at p = 0.000165. The
+batch log in `logs/` gives 21 of 24 against 72 of 72 at p = 0.0142.
+
+This is recorded here as an **open discrepancy, not a demonstrated error**. The
+run behind the 18/24 figure may exist and be lost, or may have used a different
+`verified` definition before the encoding fixes landed. The stated p-value
+reproduces exactly from the stated counts, so the arithmetic was sound for
+whatever data it was computed on.
+
+Do not quote either figure until the provenance is settled.

@@ -151,9 +151,25 @@ Two runs before committing, unchanged from `review.md`:
 Then build the citation-independence environment, which satisfies the assignment
 as stated and costs less than the full retrieval programme.
 
-## One inherited defect
+## One open discrepancy
 
-`gap-map.md` repeats the pilot's headline as "18 of 24 ... p = 0.00017". The
-batch log gives 21 of 24 against 72 of 72, Fisher exact p = 0.0142. The effect
-survives; the number does not. Both documents need the same correction before
-anything is submitted.
+`gap-map.md` and `proposal.md` both report the pilot's headline as "18 of 24 ...
+p = 0.00017". The batch log currently in `logs/` gives 21 of 24 against 72 of 72,
+Fisher exact p = 0.0142.
+
+**This is a discrepancy, not an established error.** We do not know what happened
+to the run the 18/24 figure was computed from. A log may have been lost, an
+earlier analysis pass may have used a different definition of `verified`, or the
+figure may predate the encoding fixes in `d8abb37`. Until that is established, the
+correct statement is that two numbers exist and only one has a log behind it.
+
+What can be said now, and should be:
+
+- the effect is present in the log we hold, in the same direction, at
+  p = 0.0142
+- the p-value 0.000165 does reproduce exactly from 18/24 vs 70/70, so the
+  arithmetic was sound for whatever data it was run on
+- nothing should be submitted quoting either figure until the provenance of the
+  18/24 run is settled
+
+Resolving this is a task, not a correction to apply.
