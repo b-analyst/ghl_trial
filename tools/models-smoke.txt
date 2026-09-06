@@ -34,14 +34,17 @@
 # an agent is doing something interesting enough to be worth having.
 
 # 1 -- highest reported gaming family, cheapest member
-x-ai/grok-4-fast
+# x-ai/grok-4-fast
+x-ai/grok-4.3
 
 # 2 -- open-weight RL reasoning; WATCH THIS ONE. Reasoning traces bill as
 #      output tokens and the estimator's profile came from a non-reasoning run,
 #      so it can overshoot several times over. Probe with `--epochs 1`, then
 #      `python tools/estimate_cost.py --calibrate logs/multimodel` before
 #      committing to the rest.
-qwen/qwen3-235b-a22b
+# qwen/qwen3-235b-a22b
+qwen/qwen3.8-27b
 
 # 3 -- third lab, closed weights, cheap tier
-google/gemini-2.5-flash
+# google/gemini-2.5-flash
+google/gemini-3.8-flash
