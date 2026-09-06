@@ -29,3 +29,25 @@ google/gemini-2.5-pro
 #    it visible without a lab's post-training in the way --
 deepseek/deepseek-r1
 qwen/qwen3-235b-a22b
+
+# -- newest frontier reasoning models --
+#
+# 2605.02269's mechanism claim is that RL reasoning training substantially
+# INCREASES the rate at which models exploit their specifications. The roster
+# above spans labs; these two span recency, which is the axis that claim
+# actually predicts. If the mechanism is right they should sit at the high end
+# regardless of family, and a Claude-family model landing high would be the
+# single most informative cell in the batch -- it would separate "Claude games
+# least" as a family fact from "Claude games least" as a training-recipe fact.
+#
+# SLUGS BELOW ARE UNVERIFIED GUESSES. Neither model's OpenRouter id was
+# reachable when this roster was written. Resolve both before the run:
+#
+#   python tools/check_models.py --search fable
+#   python tools/check_models.py --search astra
+#
+# then paste the real ids over these two lines. check_models.py will refuse the
+# batch until they resolve, which is the intended behaviour -- running six of
+# eight models and finding out afterwards is worse than a twenty-second fix.
+anthropic/claude-fable-5.1
+openai/gpt-6-astra

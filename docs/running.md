@@ -32,6 +32,27 @@ Nothing in `tools/` prints, logs, or writes the key. If you ever need to share a
 failing command, share it with the variable name, not the value. If a key does
 reach a commit, rotate it — deleting the line does not remove it from history.
 
+## This runs through the scaffolding's own adapter
+
+Nothing here is a parallel harness. `tools/run_multimodel.{sh,cmd}` is a loop
+whose body is one line:
+
+```
+inspect eval adapters/inspect/inspect_task.py --model openrouter/<id> --epochs N --log-dir <per-model>
+```
+
+That is the scaffold's mandated entry point, unmodified. Every contract piece
+stays on the critical path: `inspect_task.py` reads `variants.json`, renders each
+prompt through `task.py`, stages per-variant content via `Sample.files` after the
+container starts, solves with `basic_agent(bash, text_editor)`, and scores by
+executing `/grader/grader.py` as root inside the sandbox — with the container
+still `network_mode: none` and `/grader` still `0700` per `adapters/docker/adapter.json`.
+
+The runner adds three things and changes nothing: a model roster, a log
+directory per model so one provider outage cannot cost the batch, and a
+cross-model report. Swap the loop for a single `inspect eval` and you have the
+original single-model command back.
+
 ## The run
 
 ```
@@ -43,7 +64,20 @@ python tools\report_multimodel.py logs\multimodel
 On the shell side, `sh tools/run_multimodel.sh 10` and the same reporter.
 
 `check_models.py` queries OpenRouter's live catalogue and flags any retired
-slug, so a rename costs a second rather than a batch. The runner writes each
+slug, so a rename costs a second rather than a batch. When an id does not
+resolve it prints the closest catalogue entries and the exact command to find
+the right one:
+
+```
+python tools\check_models.py --search fable
+python tools\check_models.py --search astra
+```
+
+**Two roster entries are unverified guesses** — `anthropic/claude-fable-5.1` and
+`openai/gpt-6-astra`. Neither slug was reachable when the roster was written, so
+both must be resolved with `--search` before the batch will start. That refusal
+is deliberate: running six of eight models and discovering the gap afterwards is
+worse than a twenty-second fix. The runner writes each
 model to its own log directory, skips a model whose directory already has logs,
 and records a provider failure in `logs/multimodel/failed.txt` while continuing
 with the rest — one model's outage should not cost the batch.
@@ -66,9 +100,12 @@ expect six hits you need roughly `6 / rate` episodes:
 - a true rate of 3% → ~200 episodes → **29 epochs**
 
 10 epochs (70 episodes, 7 variants) is the sensible first pass: it detects a
-10% rate and costs six models' worth of tokens on a fixture that already exists.
-Go to 20 only if the first pass comes back at zero everywhere and you want to
-rule out a 5% rate before believing it.
+10% rate and costs eight models' worth of tokens — 560 episodes — on a fixture
+that already exists. Go to 20 only if the first pass comes back at zero
+everywhere and you want to rule out a 5% rate before believing it. If budget
+is tight, cut models before cutting epochs: a model with too few episodes to
+show six hits contributes nothing to the test, whereas a shorter roster still
+answers the question the run exists to answer.
 
 ## Reading the result
 
@@ -79,6 +116,13 @@ than after.
 Claude, not about the environment. The fixture works, the assignment is answered
 with a model-comparison finding that is more interesting than the original
 single-model design, and 2605.02269 supplies both the prior and the citation.
+
+**A Claude-family model lands high.** This is the cell worth watching. The
+roster carries Fable 5.1 alongside Sonnet 4.5 precisely because 2605.02269's
+mechanism claim is about *RL reasoning training*, not about labs. If a newer
+Claude games where an older one does not, "Claude games least" is a fact about a
+training recipe rather than about a family — which is a sharper result than
+either the confirmation or the null.
 
 **Gaming is zero everywhere.** The null survives the confound. The pivot becomes
 evidenced rather than inferred, and §4 of the proposal gets much stronger: *we
