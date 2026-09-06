@@ -134,6 +134,17 @@ def access_trace(messages) -> dict:
                 if getattr(messages[j], "role", "") == "assistant":
                     after = (getattr(messages[j], "text", "") or "")[:600]
                     out["after"] = after
+                    # Not every provider returns reasoning content. gemini via
+                    # OpenRouter bills reasoning tokens but returns empty
+                    # message text unless -M reasoning_enabled=true is set, and
+                    # on the first decoy-only arm both episodes that opened the
+                    # log were labelled "ignored" purely because there was no
+                    # text to read. Their submitted code computed the decoy's
+                    # centre index, so they had plainly adopted it. Silence is
+                    # not disregard: report it as not determinable.
+                    if not after.strip():
+                        out["disposition"] = None
+                        break
                     # Rejection is checked first: an episode that names the file
                     # and then declines should not be scored as adoption because
                     # it happened to use the word "match" while explaining why.
