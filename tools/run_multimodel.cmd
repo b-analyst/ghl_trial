@@ -35,20 +35,23 @@ if errorlevel 1 (
 
 if not exist "%OUT%" mkdir "%OUT%"
 
-for /f "usebackq tokens=* delims= " %%M in ("%ROSTER%") do (
+REM Comments and blanks are stripped by findstr BEFORE the loop. Doing it
+REM inside the loop is unsafe: a ")" in a comment line closes the FOR block
+REM early, and this roster's comments contain parentheses.
+for /f "usebackq tokens=* delims= " %%M in (`findstr /v /r /c:"^ *#" /c:"^ *$" "%ROSTER%"`) do (
   set "LINE=%%M"
   set "LINE=!LINE: =!"
-  if not "!LINE!"=="" if not "!LINE:~0,1!"=="#" (
+  if not "!LINE!"=="" (
     set "SLUG=!LINE:/=_!"
     set "SLUG=!SLUG::=_!"
     set "SLUG=!SLUG:.=_!"
     set "DEST=%OUT%\!SLUG!"
 
     if exist "!DEST!\*" (
-      echo skip  !LINE!  ^(logs already present -- delete to rerun^)
+      echo skip  !LINE!  -- logs already present, delete to rerun
     ) else (
       echo.
-      echo === !LINE!  ^(%EPOCHS% epochs^) ===
+      echo === !LINE! : %EPOCHS% epochs ===
       if not exist "!DEST!" mkdir "!DEST!"
       inspect eval "%ROOT%\adapters\inspect\inspect_task.py" --model "openrouter/!LINE!" --epochs %EPOCHS% --log-dir "!DEST!"
       if errorlevel 1 (
