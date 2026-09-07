@@ -26,6 +26,9 @@ meta-llama/llama-3.3-70b-instruct
 mistralai/mistral-small-3.2-24b-instruct
 # nousresearch/hermes-4-70b -- same, no tool-calling endpoint
 
-# --- C: closed, adds two cheap members to the three already in logs/final ---
-openai/gpt-5-nano
-cohere/command-r-08-2024
+# --- C: closed frontier. The three in logs/final are claude, gemini and grok;
+#        luna is the only closed OpenAI model here, and it matters because the
+#        OpenAI entry in cluster B is gpt-oss-120b, which is open-weight and so
+#        cannot speak for the lab's closed models.
+#        gpt-5-nano and cohere/command-r were listed here and never run.
+openai/gpt-5.6-luna
