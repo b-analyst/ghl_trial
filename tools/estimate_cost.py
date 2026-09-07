@@ -273,11 +273,14 @@ def main() -> int:
             print(f"  At this roster, ~{safe} epochs fits ({safe * VARIANTS} episodes/model).")
             print(f"  Or drop the most expensive rows above and re-run this estimate.")
 
-    print("\nCaveat that the arithmetic cannot carry: the profile was measured on a")
-    print("non-reasoning Claude run. A model that emits long reasoning traces bills")
-    print("them as output tokens and can exceed this by several times. Treat the")
-    print("first reasoning model in any batch as a probe -- run one epoch, re-run")
-    print("--calibrate on its log, then commit to the rest.")
+    print("\nCaveat that the arithmetic cannot carry: one profile is applied to every")
+    print(f"row, and it was measured on {prof.get('source', 'the built-in default')}.")
+    print("Per-episode token use varies by an order of magnitude between models --")
+    print("gemini-3.8-flash spent 1,001,117 input tokens per episode on this fixture")
+    print("against grok-4.3's 45,493 -- so a row for a model unlike the ones measured")
+    print("is a guess. A model that emits long reasoning traces bills them as output")
+    print("and can exceed this by several times. Treat the first model of any new kind")
+    print("as a probe: run one epoch, re-run --calibrate on its log, then commit.")
     return 0
 
 
