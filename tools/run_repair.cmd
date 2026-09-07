@@ -7,6 +7,13 @@ REM   tools\run_repair.cmd A          affected cells only
 REM   tools\run_repair.cmd B          cluster top-up only
 REM   tools\run_repair.cmd C          the new luna arm only
 REM
+REM There is a PowerShell twin, tools\run_repair.ps1, which adds -WhatIf to
+REM price a batch before running it. Invoke that one as:
+REM   powershell -ExecutionPolicy Bypass -File .\tools\run_repair.ps1 -WhatIf
+REM Calling .\run_repair.ps1 directly fails on a default Windows box with
+REM "running scripts is disabled on this system", and the answer is that
+REM per-invocation flag, not changing the machine's execution policy.
+REM
 REM ~$65 expected, ~3x that as a ceiling. 570 episodes.
 REM
 REM THREE PHASES, AND WHY EACH CELL IS IN THE ONE IT IS IN.
