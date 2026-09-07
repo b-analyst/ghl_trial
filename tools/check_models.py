@@ -43,6 +43,28 @@ def fetch_catalogue(key: str | None) -> dict[str, str]:
     return {m["id"]: m.get("name", "") for m in payload.get("data", [])}
 
 
+def fetch_tool_support(key: str | None) -> dict[str, bool]:
+    """Return {model_id: serves tool calls}.
+
+    A resolving id is not a runnable one. The solver here is
+    basic_agent(bash, text_editor), so a model with no tool-calling endpoint
+    cannot run a single episode -- OpenRouter answers 404 with 'No endpoints
+    found that support tool use'. Two models picked for a cluster sweep on
+    price and lineage, microsoft/phi-4 and nousresearch/hermes-4-70b, failed
+    exactly that way after the batch had started, because resolving the id
+    was the only thing this tool checked.
+    """
+    req = urllib.request.Request(CATALOGUE, headers={'Accept': 'application/json'})
+    if key:
+        req.add_header('Authorization', f'Bearer {key}')
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        payload = json.load(resp)
+    return {
+        m['id']: 'tools' in set(m.get('supported_parameters') or [])
+        for m in payload.get('data', [])
+    }
+
+
 def _tokens(text: str) -> set[str]:
     """Split an id or name into lowercase alphanumeric tokens."""
     out, cur = set(), ""
@@ -155,17 +177,36 @@ def main() -> int:
         print("check the id list by hand at https://openrouter.ai/models")
         return 2
 
+    try:
+        tools = fetch_tool_support(key)
+    except (OSError, ValueError, KeyError) as exc:
+        print(f"  note: tool-support lookup unavailable ({exc}); ids only")
+        tools = {}
+
     bad = []
+    notools = []
     for model_id in roster:
-        if model_id in known:
-            print(f"  ok       {model_id}")
-        else:
+        if model_id not in known:
             bad.append(model_id)
             print(f"  UNKNOWN  {model_id}")
             for candidate in near_matches(model_id, known):
                 print(f"             maybe: {candidate}")
+        elif tools and not tools.get(model_id, True):
+            notools.append(model_id)
+            print(f"  NO TOOLS {model_id}")
+        else:
+            print(f"  ok       {model_id}")
 
     print(f"\n{len(roster) - len(bad)} of {len(roster)} ids resolve.")
+    if notools:
+        print(f"{len(notools)} resolve but serve no tool-calling endpoint.")
+        print("The solver is basic_agent(bash, text_editor), so these cannot")
+        print("run a single episode -- OpenRouter answers 404 on the first")
+        print("call with \"No endpoints found that support tool use\":")
+        for model_id in notools:
+            print(f"  {model_id}")
+        print("Drop them from the roster. Otherwise the batch spends its")
+        print("startup discovering this one model at a time, mid-run.")
 
     if bad:
         print("\nThe batch will not start until these resolve. To find one:")
@@ -176,7 +217,7 @@ def main() -> int:
                   f"   # for {model_id}")
         print(f"Then paste the real id over that line in {roster_path.name}.")
 
-    return 1 if bad else 0
+    return 1 if (bad or notools) else 0
 
 
 if __name__ == "__main__":

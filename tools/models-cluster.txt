@@ -7,6 +7,10 @@
 # logs/final (claude 0%, gemini 7.5%, grok 10%), so "frontier closed" is
 # not predictive and a tight cluster A would be the real finding.
 #
+# Two entries are commented out because they resolve but serve no tool-calling
+# endpoint. check_models.py now refuses a roster containing them, which is the
+# check that was missing when they took a sweep down mid-run.
+#
 # Per-model rates at 45 episodes are noisy -- 20 claim cells each, ~2 expected
 # hits at a 10% rate. Read the clusters, not the rows.
 
@@ -18,9 +22,9 @@ minimax/minimax-m2
 # --- B: open-weight, US/EU labs ---------------------------------------------
 openai/gpt-oss-120b
 meta-llama/llama-3.3-70b-instruct
-microsoft/phi-4
+# microsoft/phi-4 -- serves no tool-calling endpoint, cannot run this fixture
 mistralai/mistral-small-3.2-24b-instruct
-nousresearch/hermes-4-70b
+# nousresearch/hermes-4-70b -- same, no tool-calling endpoint
 
 # --- C: closed, adds two cheap members to the three already in logs/final ---
 openai/gpt-5-nano
