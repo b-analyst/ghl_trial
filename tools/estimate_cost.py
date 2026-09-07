@@ -61,7 +61,9 @@ def catalogue(key: str | None) -> dict[str, dict]:
             c = float(pricing.get("completion", 0) or 0)
         except (TypeError, ValueError):
             continue
-        out[m["id"]] = {"name": m.get("name", ""), "prompt": p, "completion": c}
+        out[m["id"]] = {"name": m.get("name", ""), "prompt": p,
+                        "completion": c,
+                        "cache_read": float(pricing.get("input_cache_read", 0) or 0)}
     return out
 
 
@@ -81,8 +83,42 @@ def read_roster(path: Path) -> list[str]:
     return [s.strip() for s in lines if s.strip() and not s.lstrip().startswith("#")]
 
 
-def episode_cost(price: dict, prompt_tok: int, output_tok: int) -> float:
-    return prompt_tok * price["prompt"] + output_tok * price["completion"]
+def episode_cost(price: dict, prompt_tok: int, output_tok: int,
+                 cache_ratio: float = 0.0) -> float:
+    """Cost of one episode.
+
+    `cache_ratio` is the fraction of prompt tokens served from cache. At 0.0
+    this is the no-cache ceiling, which is the safe number to budget against
+    before a model has ever run. Afterwards use the measured ratio: providers
+    price input_cache_read at roughly a tenth of prompt, so the ceiling is not
+    the expected cost and treating it as one overstates spend badly.
+
+    Measured across every log in this repo, the ceiling came to $296.90
+    against $147.56 actually payable -- 101% over. Worst on
+    google/gemini-3.8-flash, whose prompts are 80% cache reads: $161.90
+    ceiling against $68.04 real. Runs were talked out of on that arithmetic.
+    """
+    cached = prompt_tok * cache_ratio
+    fresh = prompt_tok - cached
+    rate = price.get('cache_read') or price['prompt']
+    return fresh * price['prompt'] + cached * rate + output_tok * price['completion']
+
+
+def cache_ratio_from(log_dir) -> float | None:
+    """Fraction of prompt tokens served from cache, measured from finished logs."""
+    try:
+        from inspect_ai.log import read_eval_log
+    except ImportError:
+        return None
+    import glob as _g
+    fresh = cached = 0
+    for f in _g.glob(str(Path(log_dir) / '**' / '*.eval'), recursive=True):
+        log = read_eval_log(f)
+        for u in (log.stats.model_usage or {}).values():
+            fresh += (u.input_tokens or 0)
+            cached += (u.input_tokens_cache_read or 0)
+    total = fresh + cached
+    return (cached / total) if total else None
 
 
 def calibrate(log_dir: Path) -> dict | None:
