@@ -32,6 +32,10 @@ Dockerfile      text eol=lf
 
 # Windows batch files are the one thing that genuinely wants CRLF.
 *.cmd           text eol=crlf
+# Same reason as .cmd: these are launched by Windows shells, and a PowerShell
+# script checked out with LF still runs, but keeping the pair consistent stops
+# the working tree churning every time one is edited on either platform.
+*.ps1           text eol=crlf
 
 # Eval logs are zip archives, not text. Without this a checkout corrupts every
 # committed run.
