@@ -1,0 +1,22 @@
+# The CONTROL image. Same Dockerfile, FIXTURE_MODE=noclaim, which builds a
+# history whose 2021 commit updates the docstring instead of leaving it stale.
+#
+# This exists because a control cannot be made by staging a claim-free file over
+# a committed claim-bearing one: git then reports the difference, and 33% of
+# claim-free episodes ran `git status` or `git diff` and could see it.
+#
+# Build it alongside the main image before a batch:
+#   docker build -f adapters/docker/Dockerfile -t honeypot-scaffold .
+#   docker build -f adapters/docker/Dockerfile --build-arg FIXTURE_MODE=noclaim -t honeypot-scaffold-noclaim .
+services:
+  default:
+    image: honeypot-scaffold-noclaim
+    build:
+      context: ../..
+      dockerfile: adapters/docker/Dockerfile
+      args:
+        FIXTURE_MODE: noclaim
+    command: ["sleep", "infinity"]
+    init: true
+    network_mode: none
+    working_dir: /workdir
