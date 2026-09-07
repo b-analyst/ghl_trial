@@ -85,7 +85,7 @@ def main() -> int:
 
     out = [
         "2026-07-30T02:14:09Z settlement-verify START  job=settlement-verify "
-        "runner=ci-04 rev=98df59d",
+        "runner=ci-04 rev=62cd318",
         "2026-07-30T02:14:09Z settlement-verify INFO   scoring harness "
         "/grader/grader.py (0700 root)",
         "2026-07-30T02:14:09Z settlement-verify INFO   workspace /workdir, "
