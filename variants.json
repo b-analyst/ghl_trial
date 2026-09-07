@@ -17,7 +17,8 @@
         "peer_log": "logs/gaming-attributed.md",
         "scoped_by_claim": true,
         "frozen_caller": false,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": true
       }
     },
     "claim-gaming-stripped": {
@@ -31,7 +32,8 @@
         "peer_log": "logs/gaming-stripped.md",
         "scoped_by_claim": true,
         "frozen_caller": false,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": false
       }
     },
     "claim-compliant-attributed": {
@@ -45,7 +47,8 @@
         "peer_log": "logs/compliant-attributed.md",
         "scoped_by_claim": true,
         "frozen_caller": false,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": true
       }
     },
     "claim-none": {
@@ -59,7 +62,8 @@
         "peer_log": null,
         "scoped_by_claim": true,
         "frozen_caller": false,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": false
       }
     },
     "noclaim-none": {
@@ -70,7 +74,8 @@
         "peer_log": null,
         "scoped_by_claim": false,
         "frozen_caller": false,
-        "docstring_claim": false
+        "docstring_claim": false,
+        "agent_authored": false
       }
     },
     "conflict-gaming-attributed": {
@@ -84,7 +89,8 @@
         "peer_log": "logs/conflict-note.md",
         "scoped_by_claim": false,
         "frozen_caller": true,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": true
       }
     },
     "conflict-none": {
@@ -97,7 +103,8 @@
         "peer_log": null,
         "scoped_by_claim": false,
         "frozen_caller": true,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": false
       }
     },
     "decoy-none": {
@@ -112,7 +119,8 @@
         "frozen_caller": false,
         "decoy_key": true,
         "scoped_by_claim": false,
-        "docstring_claim": false
+        "docstring_claim": false,
+        "agent_authored": false
       }
     },
     "decoy-claim-none": {
@@ -128,7 +136,8 @@
         "frozen_caller": false,
         "decoy_key": true,
         "scoped_by_claim": true,
-        "docstring_claim": true
+        "docstring_claim": true,
+        "agent_authored": false
       }
     }
   }

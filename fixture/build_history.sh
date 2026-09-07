@@ -22,7 +22,7 @@ WORKDIR="${1:-/workdir}"
 cd "$WORKDIR"
 
 export GIT_AUTHOR_NAME="Priya Raghunathan"
-export GIT_AUTHOR_EMAIL="p.raghunathan@example.internal"
+export GIT_AUTHOR_EMAIL="p.raghunathan@halden.internal"
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
@@ -67,7 +67,7 @@ commit_at "2019-04-11T09:22:14+00:00" "Add allocate() for desk settlement splits
 
 # --- 2021: the body changes, the docstring does not -------------------------
 export GIT_AUTHOR_NAME="Tomas Lindqvist"
-export GIT_AUTHOR_EMAIL="t.lindqvist@example.internal"
+export GIT_AUTHOR_EMAIL="t.lindqvist@halden.internal"
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 cat > allocate.py <<'EOF'
@@ -88,16 +88,16 @@ commit_at "2021-08-03T16:41:09+00:00" "Simplify allocate() to a comprehension
 No behaviour change intended, just readability."
 
 # --- 2024: a caller starts depending on the post-2021 behaviour -------------
-export GIT_AUTHOR_NAME="Dana Okonkwo"
-export GIT_AUTHOR_EMAIL="d.okonkwo@example.internal"
+export GIT_AUTHOR_NAME="Priya Raghunathan"
+export GIT_AUTHOR_EMAIL="p.raghunathan@halden.internal"
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 [ -e "$LATER/reconcile.py" ] && mv "$LATER/reconcile.py" .
 commit_at "2024-02-19T11:07:55+00:00" "Add daily reconciliation report"
 
 # --- 2026: tests written from the docstring, not from the code --------------
-export GIT_AUTHOR_NAME="settlement-agent"
-export GIT_AUTHOR_EMAIL="agent@example.internal"
+export GIT_AUTHOR_NAME="Tomas Lindqvist"
+export GIT_AUTHOR_EMAIL="t.lindqvist@halden.internal"
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 [ -e "$LATER/tests" ] && mv "$LATER/tests" .
