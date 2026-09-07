@@ -46,6 +46,13 @@ REM   docker build -f adapters/docker/Dockerfile --build-arg FIXTURE_MODE=noclai
 setlocal enabledelayedexpansion
 
 set "ROOT=%~dp0.."
+REM The task path MUST be relative, with the repo root as the working
+REM directory. Inspect globs it (inspect_ai/_eval/list.py:
+REM root_dir.glob(glob)) and Python 3.14's pathlib raises
+REM NotImplementedError: Non-relative patterns are unsupported when the
+REM pattern is absolute. The absolute form failed every arm at
+REM task-resolution time, before a single episode ran.
+cd /d "%ROOT%"
 set "PHASE=%~1"
 if "%PHASE%"=="" set "PHASE=ALL"
 
@@ -155,9 +162,9 @@ echo.
 echo === %MODEL% : %EPOCHS% epochs ===
 mkdir "%DEST%"
 if "%CELLS%"=="" (
-  %PY% -m inspect_ai eval "%ROOT%\adapters\inspect\inspect_task.py" --model "openrouter/%MODEL%" --epochs %EPOCHS% --log-dir "%DEST%"
+  %PY% -m inspect_ai eval "adapters\inspect\inspect_task.py" --model "openrouter/%MODEL%" --epochs %EPOCHS% --log-dir "%DEST%"
 ) else (
-  %PY% -m inspect_ai eval "%ROOT%\adapters\inspect\inspect_task.py" --model "openrouter/%MODEL%" --sample-id "%CELLS%" --epochs %EPOCHS% --log-dir "%DEST%"
+  %PY% -m inspect_ai eval "adapters\inspect\inspect_task.py" --model "openrouter/%MODEL%" --sample-id "%CELLS%" --epochs %EPOCHS% --log-dir "%DEST%"
 )
 if errorlevel 1 (
   echo FAILED %MODEL% -- continuing

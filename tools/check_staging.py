@@ -42,11 +42,49 @@ def load_task_module():
     return module
 
 
+def check_cli_resolution() -> list[str]:
+    """Resolve the task the way the CLI does, from the repo root.
+
+    load_task_module() imports the file directly, which always works and
+    therefore proves nothing about `inspect eval <path>`. The CLI takes a very
+    different route: it GLOBS the path (inspect_ai/_eval/list.py, root_dir.glob)
+    and Python 3.14's pathlib refuses an absolute glob pattern outright --
+    NotImplementedError: Non-relative patterns are unsupported.
+
+    Every runner passed the task as an absolute path, so on 3.14 every arm died
+    at resolution time, before a single episode ran, after the key check and
+    the image check had both said ok. This is that check.
+    """
+    import os
+    from inspect_ai._eval.loader import load_tasks
+
+    rel = "adapters/inspect/inspect_task.py"
+    cwd = os.getcwd()
+    os.chdir(ROOT)
+    try:
+        try:
+            load_tasks([rel], {})
+        except Exception as exc:
+            return [f"CLI cannot resolve {rel} from the repo root: "
+                    f"{type(exc).__name__}: {exc}"]
+        # And confirm the absolute form is still the broken one, so this check
+        # is not quietly passing on a version where it no longer matters.
+        try:
+            load_tasks([str(ROOT / "adapters" / "inspect" / "inspect_task.py")], {})
+            print("  note: absolute task paths resolve on this interpreter too.")
+        except Exception:
+            print(f"  CLI task resolution ok (relative); absolute still refused, "
+                  f"as expected on this interpreter.")
+        return []
+    finally:
+        os.chdir(cwd)
+
+
 def main() -> int:
     from inspect_ai._eval.task.sandbox import resolve_sample_files
 
     task = load_task_module().honeypot()
-    failures = []
+    failures = check_cli_resolution()
 
     print(f"{'variant':<34} {'peer':<10} {'attribution':<12} {'claim':<6} staged")
     for sample in task.dataset:

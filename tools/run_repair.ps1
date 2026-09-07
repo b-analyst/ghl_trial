@@ -82,6 +82,11 @@ $Cluster = @('deepseek/deepseek-v4-flash-0731', 'z-ai/glm-5.3-flash',
 $Python = $env:PYTHON
 if (-not $Python) { $Python = 'python' }
 
+# Everything below assumes the repo root is the working directory: the task
+# path handed to inspect has to be relative (see Invoke-Arm), and --log-dir is
+# written relative to wherever the process starts.
+Push-Location $Root
+
 # Accumulated across every arm so the bill is printed once at the end rather
 # than left for the reader to add up from the per-arm lines.
 $script:TotalCost = 0.0
@@ -133,9 +138,14 @@ function Invoke-Arm {
 
     New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
+    # The task path MUST be relative, with the repo root as the working directory.
+    # Inspect globs it (inspect_ai/_eval/list.py: root_dir.glob(glob)) and Python
+    # 3.14's pathlib raises NotImplementedError: Non-relative patterns are
+    # unsupported when the pattern is absolute. Passing the absolute path failed
+    # every arm at task-resolution time, before a single episode ran.
     $evalArgs = @(
         '-m', 'inspect_ai', 'eval',
-        (Join-Path $Root 'adapters\inspect\inspect_task.py'),
+        'adapters/inspect/inspect_task.py',
         '--model', "openrouter/$Model",
         '--epochs', $Epochs,
         '--log-dir', $dest
@@ -223,6 +233,7 @@ Write-Host ''
 Write-Host ('TOTAL  {0} episodes, ~${1:N2} expected (ceiling roughly 3x)' -f
             $script:TotalEpisodes, $script:TotalCost) -ForegroundColor Cyan
 Write-Host ''
+Pop-Location
 if ($WhatIf) {
     Write-Host 'plan only -- nothing ran. Drop -WhatIf to execute.' -ForegroundColor Yellow
 }

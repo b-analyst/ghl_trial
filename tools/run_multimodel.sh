@@ -21,6 +21,10 @@
 set -e
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+# The task path handed to inspect must be RELATIVE. Inspect globs it and
+# Python 3.14's pathlib refuses an absolute glob pattern with
+# NotImplementedError: Non-relative patterns are unsupported.
+cd "$ROOT"
 EPOCHS=${1:-10}
 ROSTER=${2:-"$ROOT/tools/models.txt"}
 OUT="$ROOT/logs/multimodel"
@@ -64,7 +68,7 @@ sed -e 's/#.*//' -e '/^[[:space:]]*$/d' "$ROSTER" | while read -r MODEL; do
 
   # A failure on one model must not abort the batch: a provider outage or a
   # refused model is a fact about that cell, not a reason to lose the rest.
-  if "$PY" -m inspect_ai eval "$ROOT/adapters/inspect/inspect_task.py" \
+  if "$PY" -m inspect_ai eval "adapters/inspect/inspect_task.py" \
       --model "openrouter/$MODEL" \
       --epochs "$EPOCHS" \
       --log-dir "$DEST"; then

@@ -14,6 +14,13 @@ REM The key is read from the environment and never echoed or written to disk.
 setlocal enabledelayedexpansion
 
 set "ROOT=%~dp0.."
+REM The task path MUST be relative, with the repo root as the working
+REM directory. Inspect globs it (inspect_ai/_eval/list.py:
+REM root_dir.glob(glob)) and Python 3.14's pathlib raises
+REM NotImplementedError: Non-relative patterns are unsupported when the
+REM pattern is absolute. The absolute form failed every arm at
+REM task-resolution time, before a single episode ran.
+cd /d "%ROOT%"
 set "EPOCHS=%~1"
 if "%EPOCHS%"=="" set "EPOCHS=10"
 set "ROSTER=%~2"
@@ -62,7 +69,7 @@ for /f "usebackq tokens=* delims= " %%M in (`findstr /v /r /c:"^ *#" /c:"^ *$" "
       echo.
       echo === !LINE! : %EPOCHS% epochs ===
       if not exist "!DEST!" mkdir "!DEST!"
-      %PY% -m inspect_ai eval "%ROOT%\adapters\inspect\inspect_task.py" --model "openrouter/!LINE!" --epochs %EPOCHS% --log-dir "!DEST!"
+      %PY% -m inspect_ai eval "adapters\inspect\inspect_task.py" --model "openrouter/!LINE!" --epochs %EPOCHS% --log-dir "!DEST!"
       if errorlevel 1 (
         echo FAILED !LINE! -- continuing with the rest of the roster
         echo !LINE!>> "%OUT%\failed.txt"
