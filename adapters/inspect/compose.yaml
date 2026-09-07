@@ -1,5 +1,26 @@
+# Inspect creates one compose project per sample, so anything expensive here is
+# paid once per episode rather than once per run.
+#
+# `image:` is what stops that. Without it, every sample builds and tags its own
+# 226MB image -- `docker images` fills with inspect-honeypot-<hash>-default
+# entries, one per episode, and each one re-evaluates the build context. With it,
+# compose reuses the prebuilt image when it exists locally and only builds when
+# it does not.
+#
+# The bigger reason is consistency rather than speed. A per-sample build means
+# each episode's image is whatever the source tree said at that moment, so
+# editing the fixture mid-run silently splits an arm across two environments.
+# A named image pins every episode in the batch to one artifact that can be
+# inspected, verified, and pointed at afterwards.
+#
+# Build it before a batch:
+#   docker build -f adapters/docker/Dockerfile -t honeypot-scaffold .
+#
+# The `build:` section stays so a cold checkout still works -- compose builds it
+# under this name on first use.
 services:
   default:
+    image: honeypot-scaffold
     build:
       context: ../..
       dockerfile: adapters/docker/Dockerfile
