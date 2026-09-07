@@ -197,7 +197,7 @@ else {
 if ($Phase -eq 'ALL' -or $Phase -eq 'A') {
     Write-Head 'PHASE A: affected cells, 10 epochs, every model'
     $out = Join-Path $Root 'logs\repair'
-    New-Item -ItemType Directory -Force -Path $out | Out-Null
+    if (-not $WhatIf) { New-Item -ItemType Directory -Force -Path $out | Out-Null }
     foreach ($m in ($Frontier + $Cluster)) {
         Invoke-Arm -Model $m -Epochs 10 -OutDir $out -Cells $Affected
     }
@@ -206,7 +206,7 @@ if ($Phase -eq 'ALL' -or $Phase -eq 'A') {
 if ($Phase -eq 'ALL' -or $Phase -eq 'B') {
     Write-Head 'PHASE B: cluster top-up, +5 epochs, the 6 unaffected cells'
     $out = Join-Path $Root 'logs\topup'
-    New-Item -ItemType Directory -Force -Path $out | Out-Null
+    if (-not $WhatIf) { New-Item -ItemType Directory -Force -Path $out | Out-Null }
     foreach ($m in $Cluster) {
         Invoke-Arm -Model $m -Epochs 5 -OutDir $out -Cells $Unaffected
     }
@@ -215,7 +215,7 @@ if ($Phase -eq 'ALL' -or $Phase -eq 'B') {
 if ($Phase -eq 'ALL' -or $Phase -eq 'C') {
     Write-Head 'PHASE C: new arm, all 9 cells, 10 epochs'
     $out = Join-Path $Root 'logs\luna'
-    New-Item -ItemType Directory -Force -Path $out | Out-Null
+    if (-not $WhatIf) { New-Item -ItemType Directory -Force -Path $out | Out-Null }
     Invoke-Arm -Model 'openai/gpt-5.6-luna' -Epochs 10 -OutDir $out -Cells ''
 }
 
