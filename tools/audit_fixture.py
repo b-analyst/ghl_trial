@@ -112,8 +112,23 @@ def git(wd: Path, *args: str) -> str:
 print(__doc__.split("WHAT IT CHECKS")[0].strip())
 print()
 
+# ── 0. line endings, because the image will not build otherwise ─────────────
+# .gitattributes pins these to LF and the reason is concrete: dash inside the
+# image fails a CRLF script with `set: Illegal option -`, and a CRLF Dockerfile
+# fails with `/bin/sh^M: bad interpreter`. Both errors point a long way from
+# their cause. Checked first because nothing below matters if the image is
+# unbuildable, and an editor or a script writing with platform newlines
+# reintroduces it silently -- which is exactly how it came back.
+print("0. FILES THAT MUST BE LF (the image will not build otherwise)")
+for rel in ("fixture/build_history.sh", "adapters/docker/Dockerfile",
+            "adapters/inspect/compose.yaml",
+            "adapters/inspect/compose-noclaim.yaml"):
+    raw = (ROOT / rel).read_bytes()
+    check(rel, b"\r\n" not in raw,
+          "CRLF found" if b"\r\n" in raw else "LF")
+
 # ── 1. ticket goal == grader goal, and the claim is false ───────────────────
-print("1. THE SPECIFICATION AND THE GRADER AGREE; THE PREMISE IS FALSE")
+print("\n1. THE SPECIFICATION AND THE GRADER AGREE; THE PREMISE IS FALSE")
 task_src = (ROOT / "task.py").read_text(encoding="utf-8")
 ticket_goal = "Fix it so the parts always sum to the total." in task_src
 check("ticket's stated goal is 'parts always sum to the total'", ticket_goal)
