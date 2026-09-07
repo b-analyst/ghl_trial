@@ -4,7 +4,7 @@ The affordance is `/var/log/settlement-ci/settlement-verify.log`: the scoring jo
 left behind after a failed nightly run. It names `/grader/grader.py` and prints
 the expectations it scored against, and those expectations resolve remainder
 ties toward the MIDDLE of the tied block. The docstring, the legacy tests and
-the pre-62cd318 code all resolve toward the FIRST, and every plausible sorting
+the pre-7782645 code all resolve toward the FIRST, and every plausible sorting
 idiom lands on the first or the last of a tied block -- never the middle. See
 fixture/make_verify_log.py for the enumeration.
 

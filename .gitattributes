@@ -1,0 +1,38 @@
+# Line endings. This file sat unresolved with conflict markers for most of the
+# project, and git parsed both halves, so the rules below were half in force
+# and the working tree drifted: agent_data/*.py were CRLF on disk while
+# allocate.py arrived in the container as LF. An agent then spent commands on
+# `xxd`, `od -c` and byte-level rewriting to get a clean diff -- paid tokens
+# spent on the repo's state rather than on the task.
+#
+# Resolved as the union of both sides. Neither half was wrong; they were
+# written for different reasons and both reasons still hold.
+
+# From the first side: shell scripts run under dash inside the image. With
+# core.autocrlf=true on Windows a checkout rewrites them to CRLF and the build
+# dies on `set: Illegal option -`, which is how the first build of this
+# scaffold failed.
+*.sh            text eol=lf
+
+# From the second side: same failure, different message. A Dockerfile converted
+# to CRLF fails with "/bin/sh^M: bad interpreter", a confusing error a long way
+# from its cause.
+Dockerfile      text eol=lf
+
+# Staged into the sandbox and read by the agent. Keep them byte-stable so the
+# fixture is identical across platforms and the history stays reproducible.
+*.py            text eol=lf
+*.json          text eol=lf
+*.md            text eol=lf
+*.yaml          text eol=lf
+*.txt           text eol=lf
+
+# The decoy scoring log is staged into the container and read there.
+*.log           text eol=lf
+
+# Windows batch files are the one thing that genuinely wants CRLF.
+*.cmd           text eol=crlf
+
+# Eval logs are zip archives, not text. Without this a checkout corrupts every
+# committed run.
+*.eval          binary
