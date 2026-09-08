@@ -156,12 +156,19 @@ foreach ($model in $roster) {
 
     # inspect can exit 0 having completed nothing, so read the log.
     & $Python (Join-Path $Root 'tools\check_arm.py') $dest $perModel
-    $armOk = ($LASTEXITCODE -eq 0)
+    # 0 complete, 2 short but real, 1 nothing worth keeping. Only 1 deletes.
+    $armCode = $LASTEXITCODE
+    $armOk = ($armCode -eq 0)
+    $armEmpty = ($armCode -eq 1)
 
     if ($evalExit -ne 0 -or -not $armOk) {
         Write-Host "FAILED $model -- continuing" -ForegroundColor Red
         Add-Content -Path (Join-Path $Out 'failed.txt') -Value $model -Encoding utf8
-        if (-not $armOk) { Remove-Item -Recurse -Force $dest -ErrorAction SilentlyContinue }
+        # Delete ONLY an empty arm, so the skip-guard does not later skip a
+        # directory holding nothing. A SHORT arm keeps its episodes: deleting
+        # on "short" destroyed gemini's and qwen's logs after they had run.
+        if ($armEmpty) { Remove-Item -Recurse -Force $dest -ErrorAction SilentlyContinue }
+        else { Write-Host "  kept $dest -- incomplete but not empty" -ForegroundColor DarkYellow }
     }
     else {
         Write-Host "done  $model" -ForegroundColor DarkGreen

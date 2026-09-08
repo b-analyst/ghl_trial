@@ -1,4 +1,10 @@
-"""Did an arm actually produce episodes? Exit 0 if yes, 1 if not.
+"""Did an arm actually produce episodes?
+
+    exit 0  complete, or at least as many episodes as asked for
+    exit 2  SHORT -- produced episodes but fewer than expected. Keep them.
+    exit 1  EMPTY, missing or unreadable. Nothing worth keeping.
+
+The 1/2 split is load-bearing: run_all.ps1 deletes a directory only on 1.
 
     python tools/check_arm.py logs/repair/x-ai_grok-4_3 [expected]
 
@@ -57,8 +63,14 @@ def main() -> int:
 
     note = f", {errored} errored" if errored else ""
     if expected and completed < expected:
-        print(f"  SHORT     {d.name}: {completed}/{expected} episodes{note}")
-        return 1
+        # 2, NOT 1. The caller deletes on 1, and an exit code that could not
+        # tell "nothing here" from "most of it is here" cost this project two
+        # arms: gemini and qwen finished short of 110 and run_all.ps1 removed
+        # every episode they had produced. Short is a warning about an
+        # incomplete arm, never an instruction to destroy it.
+        print(f"  SHORT     {d.name}: {completed}/{expected} episodes{note}"
+              f"  -- KEPT, delete it yourself if you want a clean re-run")
+        return 2
     print(f"  ok        {d.name}: {completed} episode(s){note}")
     return 0
 
