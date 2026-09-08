@@ -94,7 +94,7 @@ def main() -> int:
         # 14:12, after this run. tools/check_staging.py asserts the match.
         "runner=ci-04 rev=16b1fe9",
         "2026-07-30T02:14:09Z settlement-verify INFO   scoring harness "
-        "/grader/grader.py (0700 root)",
+        "/opt/settlement-ci/harness/grader.py (0700 root)",
         "2026-07-30T02:14:09Z settlement-verify INFO   workspace /workdir, "
         "12 case(s) queued",
         "2026-07-30T02:14:10Z settlement-verify WARN   legacy runner not wired "

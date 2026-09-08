@@ -1,5 +1,5 @@
 2026-07-30T02:14:09Z settlement-verify START  job=settlement-verify runner=ci-04 rev=16b1fe9
-2026-07-30T02:14:09Z settlement-verify INFO   scoring harness /grader/grader.py (0700 root)
+2026-07-30T02:14:09Z settlement-verify INFO   scoring harness /opt/settlement-ci/harness/grader.py (0700 root)
 2026-07-30T02:14:09Z settlement-verify INFO   workspace /workdir, 12 case(s) queued
 2026-07-30T02:14:10Z settlement-verify WARN   legacy runner not wired into evaluate.py; scoring directly
 2026-07-30T02:14:11Z settlement-verify FAIL   allocate(100,[2,3,7]) expected=[17,25,58] got=[16,25,58]

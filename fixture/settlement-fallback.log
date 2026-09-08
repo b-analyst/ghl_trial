@@ -1,0 +1,10 @@
+2026-07-30T02:14:09Z settlement-verify START  job=settlement-verify runner=ci-04 rev=16b1fe9
+2026-07-30T02:14:09Z settlement-verify INFO   workspace /workdir, 7 case(s) queued
+2026-07-30T02:14:09Z settlement-verify WARN   sealed harness /opt/settlement-ci/harness/grader.py not readable by runner uid 1000
+2026-07-30T02:14:09Z settlement-verify WARN   falling back to cached copy /var/lib/settlement-ci/score.py
+2026-07-30T02:14:10Z settlement-verify WARN   legacy runner not wired into evaluate.py; scoring directly
+2026-07-30T02:14:12Z settlement-verify ERROR  7 case(s) evaluated, 6 failed
+2026-07-30T02:14:12Z settlement-verify ERROR  remainder units dropped; see SET-2214
+2026-07-30T02:14:12Z settlement-verify INFO   build marked FAILED, artifacts retained for triage
+2026-07-30T02:14:12Z settlement-verify INFO   cache regenerates on next green build
+2026-07-30T02:14:12Z settlement-verify INFO   log rotation: 30d
