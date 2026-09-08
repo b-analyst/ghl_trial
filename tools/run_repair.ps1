@@ -7,12 +7,11 @@ Bring every arm to a uniform 10 epochs on one fixture version.
     .\tools\run_repair.ps1            # all three phases
     .\tools\run_repair.ps1 -Phase A   # affected cells only
     .\tools\run_repair.ps1 -Phase B   # cluster top-up only
-    .\tools\run_repair.ps1 -Phase C   # the new luna arm only
     .\tools\run_repair.ps1 -WhatIf    # print the plan, spend nothing
 
-~$65 expected, roughly 3x that as a ceiling. 570 episodes.
+~$58 expected, roughly 3x that as a ceiling. 480 episodes.
 
-THREE PHASES, SPLIT BY WHAT IS ACTUALLY WRONG WITH EACH CELL
+TWO PHASES, SPLIT BY WHAT IS ACTUALLY WRONG WITH EACH CELL
 
 A  logs\repair  -- noclaim-none, decoy-none, decoy-claim-none, 10 epochs, every
    model. The first two were built by staging a claim-free file over one the
@@ -30,9 +29,13 @@ B  logs\topup   -- the 6 cells neither problem touched, +5 epochs, cluster arms
    throughout, so they top up 5 -> 10 rather than being re-run. The four arms
    in logs\final already have 15.
 
-C  logs\luna    -- openai/gpt-5.6-luna, all 9 cells, 10 epochs. A new arm, not
-   a repair: it is the only closed OpenAI model in the roster, since
-   gpt-oss-120b is open-weight and sits in cluster B.
+There was a phase C, a gpt-5.6-luna arm. It is gone: OpenAI's strict
+function-calling requires `required` to name every key in `properties`, and
+inspect's text_editor has optional ones, so the provider rejects every request
+with "Invalid schema for function 'text_editor' ... Missing 'file_text'".
+`-M strict_tools=false` would fix it, and is deliberately not used -- every
+other arm sends strict: true, so that flag would make one arm differ from the
+rest in how its tool calls are validated. See tools\models-cluster.txt.
 
 BUILD BOTH IMAGES FIRST -- the control has its own now:
   docker build -f adapters/docker/Dockerfile -t honeypot-scaffold .
@@ -41,7 +44,7 @@ BUILD BOTH IMAGES FIRST -- the control has its own now:
 
 [CmdletBinding()]
 param(
-    [ValidateSet('ALL', 'A', 'B', 'C')]
+    [ValidateSet('ALL', 'A', 'B')]
     [string] $Phase = 'ALL',
 
     # Print what would run, and what it should cost, without spending anything.
@@ -69,7 +72,6 @@ $PerEpisode = @{
     'openai/gpt-oss-120b'                      = 0.0120
     'meta-llama/llama-3.3-70b-instruct'        = 0.0313
     'mistralai/mistral-small-3.2-24b-instruct' = 0.0232
-    'openai/gpt-5.6-luna'                      = 0.0721
 }
 
 $Frontier = @('anthropic/claude-sonnet-5', 'google/gemini-3.8-flash',
@@ -156,9 +158,20 @@ function Invoke-Arm {
     # in 5.1 that wraps each line in a NativeCommandError and sets $? to false
     # even when the process exits 0.
     & $Python $evalArgs
-    if ($LASTEXITCODE -ne 0) {
+    $evalExit = $LASTEXITCODE
+
+    # The exit code is not the answer. `inspect eval` returns 0 after
+    # "Task interrupted (no samples completed before interruption)" when a
+    # provider rejects the request schema -- gpt-5.6-luna did exactly that and
+    # was recorded as "done" with an empty log. Read the log instead.
+    & $Python (Join-Path $Root 'tools\check_arm.py') $dest $episodes
+    $armOk = ($LASTEXITCODE -eq 0)
+
+    if ($evalExit -ne 0 -or -not $armOk) {
         Write-Host "FAILED $Model -- continuing with the rest" -ForegroundColor Red
         Add-Content -Path (Join-Path $OutDir 'failed.txt') -Value $Model -Encoding utf8
+        # Leave nothing that the skip-guard would mistake for a finished arm.
+        if (-not $armOk) { Remove-Item -Recurse -Force $dest -ErrorAction SilentlyContinue }
     }
     else {
         Write-Host "done  $Model" -ForegroundColor DarkGreen
@@ -222,12 +235,6 @@ if ($Phase -eq 'ALL' -or $Phase -eq 'B') {
     }
 }
 
-if ($Phase -eq 'ALL' -or $Phase -eq 'C') {
-    Write-Head 'PHASE C: new arm, all 9 cells, 10 epochs'
-    $out = Join-Path $Root 'logs\luna'
-    if (-not $WhatIf) { New-Item -ItemType Directory -Force -Path $out | Out-Null }
-    Invoke-Arm -Model 'openai/gpt-5.6-luna' -Epochs 10 -OutDir $out -Cells ''
-}
 
 Write-Host ''
 Write-Host ('TOTAL  {0} episodes, ~${1:N2} expected (ceiling roughly 3x)' -f
@@ -239,6 +246,6 @@ if ($WhatIf) {
 }
 else {
     Write-Host 'done. Check for leakage, then report:' -ForegroundColor Cyan
-    Write-Host '  python tools\scrub_check.py logs\repair logs\topup logs\luna'
+    Write-Host '  python tools\scrub_check.py logs\repair logs\topup'
     Write-Host '  python tools\report_multimodel.py logs\repair --baseline logs\final'
 }

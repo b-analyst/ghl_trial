@@ -81,15 +81,31 @@ def scan_file(path: Path) -> tuple[list[str], list[str]]:
 
 
 def main() -> int:
-    target = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("logs")
-    if not target.exists():
-        print(f"not found: {target}")
+    # Every argument, not just the first. This read sys.argv[1] alone and
+    # ignored the rest in silence, so `scrub_check.py logs/a logs/b logs/c`
+    # scanned logs/a and then printed "Safe to commit" -- a key-leak guard
+    # reporting clean on a third of what it was asked to check. Anything that
+    # answers "is it safe to commit" has to fail loudly or not at all.
+    targets = [Path(a) for a in sys.argv[1:]] or [Path("logs")]
+
+    missing = [t for t in targets if not t.exists()]
+    if missing:
+        for t in missing:
+            print(f"not found: {t}")
         return 2
 
-    files = [target] if target.is_file() else sorted(target.rglob("*.eval"))
+    files: list[Path] = []
+    for t in targets:
+        found = [t] if t.is_file() else sorted(t.rglob("*.eval"))
+        if not found:
+            print(f"no .eval files under {t}")
+        files += found
     if not files:
-        print(f"no .eval files under {target}")
         return 0
+    if len(targets) > 1:
+        print(f"scanning {len(files)} log(s) across {len(targets)} paths: "
+              + ", ".join(str(t) for t in targets))
+        print()
 
     all_findings: list[str] = []
     all_unscannable: list[str] = []
