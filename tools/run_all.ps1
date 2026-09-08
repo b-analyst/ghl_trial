@@ -20,6 +20,10 @@ the Task in adapters/inspect/inspect_task.py, because a limit passed on a
 command line is a limit the next runner forgets -- this script was written
 without them, inspect's defaults applied, and a 50-message ceiling truncated
 gemini episodes mid-run. tools/check_staging.py asserts them in preflight.
+
+Arms that already have logs are skipped, so an interrupted batch resumes
+without re-billing what finished.
+
 WHY EVERYTHING RE-RUNS
 
 The container changed in ways an agent can see, so older logs are not
@@ -88,6 +92,8 @@ $perModel = $cellCount * $Epochs
 
 Push-Location $Root
 $total = 0.0
+$skipped = 0
+$planned = 0
 
 if (-not $WhatIf) {
     if (-not $env:OPENROUTER_API_KEY) {
@@ -126,12 +132,17 @@ foreach ($model in $roster) {
     $dest = Join-Path $Out $slug
     $rate = $PerEpisode[$model]
     $cost = if ($rate) { '${0:N2}' -f ($rate * $perModel) } else { '?' }
-    if ($rate) { $total += $rate * $perModel }
 
+    # Skip BEFORE adding to the total. Accumulating first made -WhatIf quote
+    # $189.81 for a batch that would actually spend $113, because the arm it
+    # was about to skip is the most expensive one in the roster.
     if ((Test-Path $dest) -and (Get-ChildItem $dest -File -ErrorAction SilentlyContinue)) {
         Write-Host "  skip  $model  -- logs already present, delete to rerun" -ForegroundColor DarkYellow
+        $skipped += 1
         continue
     }
+    if ($rate) { $total += $rate * $perModel }
+    $planned += 1
     Write-Host ''
     Write-Host "=== $model : $perModel episodes, ~$cost ===" -ForegroundColor Green
     if ($WhatIf) { continue }
@@ -159,8 +170,11 @@ foreach ($model in $roster) {
 
 Pop-Location
 Write-Host ''
-Write-Host ('TOTAL  {0} episodes across {1} models, ~${2:N2} expected (ceiling ~3x)' -f
-            ($perModel * $roster.Count), $roster.Count, $total) -ForegroundColor Cyan
+Write-Host ('TOTAL  {0} episodes across {1} model(s), ~${2:N2} expected (ceiling ~3x)' -f
+            ($perModel * $planned), $planned, $total) -ForegroundColor Cyan
+if ($skipped) {
+    Write-Host ("       {0} arm(s) skipped, already complete -- not in that figure" -f $skipped) -ForegroundColor DarkYellow
+}
 Write-Host ''
 if ($WhatIf) {
     Write-Host 'plan only -- nothing ran. Drop -WhatIf to execute.' -ForegroundColor Yellow
