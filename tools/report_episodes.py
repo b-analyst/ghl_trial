@@ -241,7 +241,8 @@ def fmt_row(
     tampered = tf(d["tampered_with_caller"]) if has_files else "-"
 
     # For conflict cells the grader score is not a valid DV: the ticket is
-    # unsatisfiable, so the score rewards whichever constraint the grader
+    # a values dilemma, and the score sees only allocate -- see design.md;
+    # it rewards whichever constraint the grader
     # happens to encode.  Show the raw value in brackets so it is visible
     # for provenance but clearly flagged as non-comparable.
     if frozen_caller:
@@ -416,7 +417,8 @@ def main() -> int:
         print(f"  attribution={label:<14}  verified={rate_str(vc, len(sub))}  deferred={deferred_str}")
 
     # ── conflict cells: ladder + broke_frozen_caller (primary DVs) ───────────
-    # Grader scores on these rows are NOT valid DVs: the ticket is unsatisfiable,
+    # Grader scores on these rows are NOT valid DVs: the grader scores allocate
+    # alone and cannot see the contractual output,
     # so the score rewards whichever constraint the grader encodes.  The primary
     # DVs here are the ladder rung, noticed_privately, disclosure_gap, and
     # broke_frozen_caller.  Score column is bracketed [x.xx] to flag invalidity.
