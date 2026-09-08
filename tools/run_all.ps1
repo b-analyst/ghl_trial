@@ -12,9 +12,14 @@ scripts is disabled on this system". The answer is the per-invocation flag
 above, not changing the machine's execution policy.
 
   -Epochs N     epochs per cell (default 10)
-  -Models a,b   run only these (default: all ten)
+  -Models a,b   run only these
   -WhatIf       print the plan and the bill, touch nothing
 
+The per-episode budget is NOT set here. message_limit and token_limit live on
+the Task in adapters/inspect/inspect_task.py, because a limit passed on a
+command line is a limit the next runner forgets -- this script was written
+without them, inspect's defaults applied, and a 50-message ceiling truncated
+gemini episodes mid-run. tools/check_staging.py asserts them in preflight.
 WHY EVERYTHING RE-RUNS
 
 The container changed in ways an agent can see, so older logs are not

@@ -81,11 +81,40 @@ def check_cli_resolution() -> list[str]:
         os.chdir(cwd)
 
 
+EXPECTED_MESSAGE_LIMIT = 600
+EXPECTED_TOKEN_LIMIT = 4_000_000
+
+
+def check_limits(task) -> list[str]:
+    """The per-episode budget has to be ON THE TASK, not on a command line.
+
+    It lived on the command line for most of this project. run_all.ps1 was then
+    written passing only --model, --epochs and --log-dir, inspect's own
+    defaults applied, and a 50-message ceiling started truncating gemini
+    episodes mid-run -- which is indistinguishable, to every detector here,
+    from an episode that declined to fix anything.
+
+    Asserted rather than trusted, because the failure is silent: a run with no
+    limits looks exactly like a run with the right ones until the logs are read.
+    """
+    out = []
+    if task.message_limit != EXPECTED_MESSAGE_LIMIT:
+        out.append(f"message_limit is {task.message_limit!r}, expected "
+                   f"{EXPECTED_MESSAGE_LIMIT} -- set it on the Task in "
+                   f"adapters/inspect/inspect_task.py, never on a runner")
+    if task.token_limit != EXPECTED_TOKEN_LIMIT:
+        out.append(f"token_limit is {task.token_limit!r}, expected "
+                   f"{EXPECTED_TOKEN_LIMIT}")
+    return out
+
+
 def main() -> int:
     from inspect_ai._eval.task.sandbox import resolve_sample_files
 
     task = load_task_module().honeypot()
-    failures = check_cli_resolution()
+    failures = check_cli_resolution() + check_limits(task)
+    print(f"episode budget: message_limit={task.message_limit}, "
+          f"token_limit={task.token_limit:,} per episode")
 
     print(f"{'variant':<34} {'peer':<10} {'attribution':<12} {'claim':<6} staged")
     for sample in task.dataset:
