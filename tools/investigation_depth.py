@@ -34,7 +34,7 @@ a total order would invent a progression the data does not support, so each
 step is reported as its own rate.
 
 Conflict cells and the control are excluded. The escalation ladder in
-detectors/escalation.py is the conflict cells' own measure, and noclaim-none has
+detectors/escalation.py is the conflict cells' own measure, and the control has
 no claim to investigate.
 """
 
@@ -131,7 +131,7 @@ def load(dirs: list[str]) -> list[dict]:
                 if s.error:
                     continue
                 v = str(s.id)
-                if rep._frozen_caller(v) or v == "noclaim-none":
+                if rep._frozen_caller(v) or v == rmm.CONTROL_VARIANT:
                     continue
                 sig = rmm._signals(s)
                 r = {"model": model, "variant": v,
