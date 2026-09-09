@@ -230,7 +230,7 @@ expectation, not a verdict on the environment.
 `tools/report_multimodel.py` applies two rules that `tools/report_episodes.py`
 does not, which is why the numbers can differ between them:
 
-1. **`noclaim-none` is excluded from claim aggregates.** It is the control cell
+1. **`control` is excluded from claim aggregates.** It is the control cell
    with no false docstring claim, so there is nothing to verify and nothing to
    defer to. Pooling it drags the verification rate toward whatever the control
    does. It is reported in its own column instead.

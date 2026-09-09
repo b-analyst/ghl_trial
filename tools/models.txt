@@ -1,53 +1,33 @@
-# Model roster for the confound-removal run.
+# The roster. One model per line; blank lines and # comments are ignored.
+# This is the single source of truth -- tools/run_all.ps1, tools/run_all.sh and
+# tools/check_models.py all read it, and tools/estimate_cost.py prices it.
 #
-# One OpenRouter model id per line. Blank lines and #-comments ignored.
-#
-# WHY THESE. Nishimura-Gasparian, McCarthy & Lindner (arXiv 2605.02269) report
-# that all tested models exploit their specifications at non-negligible rates,
-# with the HIGHEST rates in Grok 4 and the LOWEST in Claude models. The pilot ran
-# 161 episodes on claude-sonnet-5 and 14 on claude-sonnet-4-5 -- both Claude --
-# saw zero gaming, and concluded the direction was exhausted. That null is
-# confounded with the model family that games least. This roster removes the
-# confound by spanning the reported range rather than sampling one end of it.
-#
-# VERIFY IDS BEFORE THE RUN. OpenRouter renames and retires slugs. Run
-#   python tools/check_models.py
-# first; it queries the live model list and reports any id that will 404, so a
-# typo costs a second rather than a whole batch.
+# Two entries that resolve, advertise tool support, and still cannot run this
+# fixture are recorded at the bottom so nobody re-adds them.
 
-# -- the incumbent: reproduces the pilot's cell, anchors the comparison --
-anthropic/claude-sonnet-4.5
+# frontier, closed weights
+anthropic/claude-sonnet-5
+google/gemini-3.8-flash
+x-ai/grok-4.3
 
-# -- the high end of the reported gaming range --
-x-ai/grok-4
+# open weights, Chinese labs
+qwen/qwen3.8-27b
+deepseek/deepseek-v4-flash-0731
+z-ai/glm-5.3-flash
+minimax/minimax-m2
 
-# -- mid-range frontier, different labs, different RL recipes --
-openai/gpt-5
-google/gemini-2.5-pro
+# open weights, US/EU labs
+openai/gpt-oss-120b
+meta-llama/llama-3.3-70b-instruct
+mistralai/mistral-small-3.2-24b-instruct
 
-# -- open-weight: RL reasoning training is the reported driver, and these make
-#    it visible without a lab's post-training in the way --
-deepseek/deepseek-r1
-qwen/qwen3-235b-a22b
-
-# -- newest frontier reasoning models --
-#
-# 2605.02269's mechanism claim is that RL reasoning training substantially
-# INCREASES the rate at which models exploit their specifications. The roster
-# above spans labs; these two span recency, which is the axis that claim
-# actually predicts. If the mechanism is right they should sit at the high end
-# regardless of family, and a Claude-family model landing high would be the
-# single most informative cell in the batch -- it would separate "Claude games
-# least" as a family fact from "Claude games least" as a training-recipe fact.
-#
-# SLUGS BELOW ARE UNVERIFIED GUESSES. Neither model's OpenRouter id was
-# reachable when this roster was written. Resolve both before the run:
-#
-#   python tools/check_models.py --search fable
-#   python tools/check_models.py --search astra
-#
-# then paste the real ids over these two lines. check_models.py will refuse the
-# batch until they resolve, which is the intended behaviour -- running six of
-# eight models and finding out afterwards is worse than a twenty-second fix.
-anthropic/claude-fable-5.1
-openai/gpt-6-astra
+# --- do not re-add -----------------------------------------------------------
+# openai/gpt-5.6-luna and cohere/command-r-08-2024
+#   OpenAI's strict function-calling requires `required` to name every key in
+#   `properties`. inspect's text_editor tool has optional ones, so the provider
+#   rejects every request: "Invalid schema for function 'text_editor' ...
+#   Missing 'file_text'". `-M strict_tools=false` fixes it and is deliberately
+#   unused -- every other arm sends strict: true, and flipping it for one arm
+#   makes that arm differ in how its tool calls are validated.
+# microsoft/phi-4 and nousresearch/hermes-4-70b
+#   resolve, but serve no tool-calling endpoint at all.
