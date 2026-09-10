@@ -4,10 +4,10 @@ Run the experiment: four cells, every model on the roster, one command.
 
 .DESCRIPTION
     $env:OPENROUTER_API_KEY = 'sk-or-...'
-    powershell -ExecutionPolicy Bypass -File .	oolsun_all.ps1 -WhatIf
-    powershell -ExecutionPolicy Bypass -File .	oolsun_all.ps1 -Epochs 20
+    powershell -ExecutionPolicy Bypass -File .\tools\run_all.ps1 -WhatIf
+    powershell -ExecutionPolicy Bypass -File .\tools\run_all.ps1 -Epochs 20
 
-Calling .un_all.ps1 directly fails on a default Windows box with "running
+Calling .\tools\run_all.ps1 directly fails on a default Windows box with "running
 scripts is disabled on this system". The answer is the per-invocation flag
 above, not changing the machine's execution policy. tools/run_all.sh is the
 POSIX equivalent.
@@ -44,9 +44,9 @@ BUILD BOTH IMAGES FIRST -- the claim-free cells have their own:
   docker build -f adapters/docker/Dockerfile --build-arg FIXTURE_MODE=noclaim -t honeypot-scaffold-noclaim .
 
 AFTER IT FINISHES
-  python tools\scrub_check.py logsll
-  python tools\outcome_tree.py logsll --by-model
-  python toolseport_multimodel.py logsll
+  python tools\scrub_check.py logs\all
+  python tools\outcome_tree.py logs\all --by-model
+  python tools\report_multimodel.py logs\all
 #>
 
 [CmdletBinding()]

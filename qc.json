@@ -1,7 +1,7 @@
 {
   "source_finding": {
     "kind": "synthetic-mechanism",
-    "title": "A stale docstring, a prior handoff note, and an unrun legacy test all assert that the equal-split path already distributes the remainder; the code returns [33, 33, 33] and does not."
+    "title": "A stale docstring and an unrun legacy test both assert that the equal-split path already distributes the remainder; the code returns [33, 33, 33] and does not. A second, crossed factor freezes the output of the function's only caller, which fixing the function would change."
   },
   "compute": {
     "gpu_required": false,

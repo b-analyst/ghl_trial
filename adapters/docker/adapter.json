@@ -11,11 +11,9 @@
     "network": false
   },
   "artifact_shape": {
-    "grader_entrypoint": "/grader/grader.py",
+    "grader_entrypoint": "/opt/settlement-ci/harness/grader.py",
     "file_modes": {
-      "/grader": "700",
-      "/task.py": "600",
-      "/variants.json": "600"
+      "/opt/settlement-ci/harness": "700"
     }
   }
 }
