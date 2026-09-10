@@ -1,34 +1,11 @@
-"""Cluster models by how they work, not by what they score.
+"""Similarity over action sequences, in two tiers.
 
-    python tools/action_similarity.py logs/final
-    python tools/action_similarity.py logs/cluster logs/final
+    Tier 1  the sequence of tool calls, available for every model.
+    Tier 2  adds reasoning-trace features, available only where the provider
+            returns them -- which is most of the time not at all.
 
-TWO TIERS, BECAUSE ONE OF THEM IS NOT AVAILABLE FOR MOST MODELS
----------------------------------------------------------------
-ACTIONS   every episode has a tool-call sequence, for every model and every
-          provider. This is the universal metric and the one to read.
-REASONING only some providers return reasoning content. Across logs/final all
-          four arms ran with `-M reasoning_enabled=true` and only
-          gemini-3.8-flash returned anything: 58 of 124 episodes, against 0 of
-          135 for each of claude-sonnet-5, qwen3.8-27b and grok-4.3. The gap is
-          provider-level rather than a setting, and it is not random -- so a
-          similarity computed over whoever happens to return traces would
-          confound style with provider. This tier prints its coverage first and
-          refuses to compare fewer than two models.
-
-THE CONTROL THAT MATTERS
-------------------------
-Every episode in this fixture reads allocate.py and runs evaluate.py, so raw
-similarity is dominated by shared task vocabulary rather than by the model.
-Profiles are built per (model, variant) and compared only within a variant,
-then averaged across variants. The pooled comparison is printed alongside so
-the size of that confound is visible rather than assumed away.
-
-WHAT THIS IS NOT
-----------------
-Style is not lineage. Two models can share an action grammar because both were
-trained to be tidy agents. This finds clusters; it does not explain them, and
-it cannot test a claim about training-data provenance.
+Used by investigation_depth.py. This measures whether two episodes did the same
+things in the same order; it says nothing about whether either was correct.
 """
 
 from __future__ import annotations
@@ -104,7 +81,7 @@ def load(dirs):
             log = read_eval_log(f)
             model = str(log.eval.model).replace("openrouter/", "")
             for s in (log.samples or []):
-                if s.error:          # not an episode -- see report_multimodel
+                if s.error:          # not an episode -- see report
                     continue
                 episodes[model] += 1
                 seq = [action_token(c) for c in rep.extract_commands(s)]
@@ -194,7 +171,7 @@ def main() -> int:
     have = [m for m in models if len(reasoning.get(m, [])) >= 5]
     if len(have) < 2:
         print("\n  fewer than two models returned traces -- no comparison made.")
-        print("  A provider limitation, not a setting: on logs/final all four arms")
+        print("  A provider limitation, not a setting: on the pilot all four arms")
         print("  ran with -M reasoning_enabled=true and only gemini returned")
         print("  anything. Comparing whoever happens to return traces would")
         print("  confound style with provider.")

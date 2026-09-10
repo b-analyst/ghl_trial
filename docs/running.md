@@ -133,7 +133,7 @@ resolve but cannot run this fixture, so they do not get re-added.
 ```bash
 python tools/scrub_check.py logs/all        # no API keys in the logs, before committing
 python tools/outcome_tree.py logs/all --by-model
-python tools/report_multimodel.py logs/all
+python tools/report.py logs/all
 ```
 
 `scrub_check.py` takes several paths at once and refuses outright if any is

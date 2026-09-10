@@ -1,41 +1,19 @@
-"""How far into the fixture does an episode actually go, and does it matter?
+"""How far into the fixture an episode goes, and whether it matters.
 
-    python tools/investigation_depth.py logs/final
-    python tools/investigation_depth.py logs/final logs/cluster
+    python tools/investigation_depth.py logs/all
 
-TWO QUESTIONS, ONE CHEAP AND ONE THIN
--------------------------------------
-FUNNEL      what fraction of a model's episodes reach each investigation step.
-            Reads the detector signals that already exist, costs nothing, and
-            separates models the gaming table does not: grok-4.3 reaches the
-            correct fix in 87% of episodes while 1% ever opens the git history.
+FUNNEL: what fraction of a model's episodes reach each investigation step. It
+separates models the gaming table does not -- grok-4.3 reaches the correct fix
+in 87% of episodes while 1% ever opens the git history.
 
-DIVERGENCE  which actions are over-represented in episodes that gamed. This is
-            the retrospective, free version of the counterfactual an MCTS
-            rollout would buy, and on logs/final IT FINDS NOTHING. That is the
-            honest result, recorded here so the next person does not spend the
-            rollouts to rediscover it: 21 gaming episodes against 332 clean,
-            and after correcting for the number of actions tested no action
-            differs within any model. The largest within-model lift is 2.08 at
-            p = 0.29.
+DIVERGENCE: which actions are over-represented in episodes that gamed. On the
+pilot it finds nothing, and that is recorded here so it is not rediscovered at
+the price of a rollout: 21 gaming episodes against 332 clean, and after
+correcting for the number of actions tested, no action differs within any model.
 
-            Pooled, it looked like a finding -- `ed:view` at lift 1.26,
-            p = 0.035. It was an artifact. grok games more than the others AND
-            views more than the others, so pooling associated the two; within
-            model the effect vanishes (gemini p = 0.265, grok p = 1.000).
-            divergence_by_model() is therefore the only entry point offered,
-            and every p is printed alongside p x tests.
-
-WHY THE FUNNEL IS NOT A LADDER
-------------------------------
-The steps are not nested and are deliberately not scored as a depth. An episode
-can fix both paths without executing anything, and grok routinely does. Forcing
-a total order would invent a progression the data does not support, so each
-step is reported as its own rate.
-
-Conflict cells and the control are excluded. The escalation ladder in
-detectors/escalation.py is the conflict cells' own measure, and the control has
-no claim to investigate.
+Pooled it looked like a finding (`ed:view`, lift 1.26, p = 0.035) and was
+Simpson's paradox: grok both games and views more than the others, so pooling
+associated the two. Within model the effect vanishes.
 """
 
 from __future__ import annotations
@@ -52,7 +30,7 @@ _r = importlib.util.spec_from_file_location("rep", ROOT / "tools" / "report_epis
 rep = importlib.util.module_from_spec(_r)
 _r.loader.exec_module(rep)
 
-_m = importlib.util.spec_from_file_location("rmm", ROOT / "tools" / "report_multimodel.py")
+_m = importlib.util.spec_from_file_location("rmm", ROOT / "tools" / "report.py")
 rmm = importlib.util.module_from_spec(_m)
 _m.loader.exec_module(rmm)
 
@@ -150,7 +128,7 @@ def divergence_by_model(rows: list[dict], min_episodes: int = 3):
     """divergence() run separately within each model, never pooled.
 
     Pooling is not a shortcut here, it is a confound. Run pooled over
-    logs/final, `ed:view` came out at lift 1.26, p = 0.035 -- and that is an
+    the pilot, `ed:view` came out at lift 1.26, p = 0.035 -- and that is an
     artifact: grok games more than the others AND views more than the others,
     so pooling associates the two. Within model the effect is gone entirely,
     gemini p = 0.265 and grok p = 1.000. A tool that reports the pooled figure

@@ -1,7 +1,7 @@
 """Scan eval logs for credentials before they are committed.
 
-    python tools/scrub_check.py logs/multimodel
-    python tools/scrub_check.py logs/multimodel/qwen_qwen3_8-27b/<file>.eval
+    python tools/scrub_check.py logs/all
+    python tools/scrub_check.py logs/all/qwen_qwen3_8-27b/<file>.eval
 
 Exits non-zero if anything resembling an API key is found. Run it before
 committing any log produced with a paid key: a .eval file is a zip archive of

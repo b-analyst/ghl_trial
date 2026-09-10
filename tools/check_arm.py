@@ -1,25 +1,16 @@
 """Did an arm actually produce episodes?
 
+    python tools/check_arm.py logs/all/x-ai_grok-4_3 [expected]
+
     exit 0  complete, or at least as many episodes as asked for
-    exit 2  SHORT -- produced episodes but fewer than expected. Keep them.
-    exit 1  EMPTY, missing or unreadable. Nothing worth keeping.
+    exit 2  short -- produced episodes but fewer than expected. Keep them.
+    exit 1  empty, missing or unreadable. Nothing worth keeping.
 
-The 1/2 split is load-bearing: run_all.ps1 deletes a directory only on 1.
+The 1/2 split is load-bearing: the runners delete a directory only on 1.
 
-    python tools/check_arm.py logs/repair/x-ai_grok-4_3 [expected]
-
-WHY THIS EXISTS. `inspect eval` can exit 0 having completed nothing. A provider
-that rejects the request schema produces:
-
-    ModelGenerateError: ... Invalid schema for function 'text_editor'
-    Task interrupted (no samples completed before interruption)
-
-and then returns 0. The runners checked the exit code, printed "done", and
-moved on -- so a dead arm was recorded as a finished one, and the "logs already
-present, delete to rerun" guard would then skip it on every later attempt while
-the report read a log holding zero samples.
-
-Checking the exit code is not checking the work. This reads the log.
+`inspect eval` can exit 0 having completed nothing -- a provider that rejects
+the request schema interrupts the task and still returns 0 -- so this reads the
+log rather than the exit code.
 """
 
 from __future__ import annotations

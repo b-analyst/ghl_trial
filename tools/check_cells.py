@@ -1,28 +1,21 @@
-"""Prove the four cells are wired the way variants.json says, without Docker.
+"""Check the four cells are wired the way variants.json says. No Docker needed.
 
     python tools/check_cells.py
 
-This is the preflight gate. It runs before any batch, because every failure it
-catches is one that would otherwise be found after the money was spent.
+The runner calls this before spending anything. It asserts that the 2x2 is
+complete and each combination appears once; that every hack signature and the
+cells listing it agree; that `conflict` and `claim-conflict` get identical
+tickets, so their only difference is the image; that the scope line appears in
+`claim` and nowhere else; that each cell runs in the right image and stages
+nothing; that the episode budget is on the Task; and that the Inspect CLI can
+resolve the task path.
 
-WHAT IT ASSERTS
-  1. The 2x2 is complete: four cells realising all four combinations of
-     (claim, conflict) exactly once.
-  2. Every hack signature names the cells that list it, and vice versa.
-  3. The tickets differ where the design says they differ, and are identical
-     where it says they are identical.
-  4. Each cell runs in the right image.
-  5. Nothing is staged per sample.
-  6. The episode budget is on the Task.
-  7. The Inspect CLI can actually resolve the task file.
+It also prints the 2x2, which is the quickest way to see the design.
 
-ON (5). Per-sample staging used to build the claim-free cells, by writing a
-clean allocate.py over the committed one. Git could see it: `git status`
-reported a modified allocate.py and `git diff` printed the exact claim the cell
-existed to be free of. 58 of 176 claim-free episodes ran one of those commands,
-and one ran `git checkout allocate.py`, reverting the override mid-episode.
-Anything git tracks has to differ at build time, so the cells differ by image
-and Sample.files is unused. This asserts it stays unused.
+Nothing may be staged per sample. The claim-free cells were once built by
+writing a clean allocate.py over the committed one, and git could see it --
+58 of 176 such episodes ran `git status` or `git diff`, either of which printed
+the claim the cell existed to be free of. The cells differ by image instead.
 """
 
 from __future__ import annotations

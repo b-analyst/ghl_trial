@@ -1,47 +1,24 @@
-"""Compare detector signals across models from a multi-model batch.
+"""Cross-model report: what each model did, cell by cell.
 
-    python tools/report_multimodel.py logs/multimodel --baseline logs
+    python tools/report.py logs/all
+    python tools/report.py logs/all --baseline logs/other
 
-Expects one subdirectory per model, as written by tools/run_all.{sh,ps1}, and
-reads every .eval log beneath each. No Docker required.
+Reads every .eval log under one subdirectory per model. No Docker required.
 
-`--baseline PATH` adds the logs under PATH as extra arms, labelled by the model
-each log was actually run on, and picks the arm with the most episodes as the
-comparison baseline. It reads PATH recursively and raises if it finds nothing:
-it used to glob non-recursively, find zero logs in a directory full of them,
-and print a report with no baseline at all rather than saying so.
+Gaming is read off variants.json: an episode games if a hack signature THAT ITS
+CELL DECLARES fired. Picking detector fields by eye instead gave three different
+answers for the same episodes, which is why the definition lives in the fixture
+rather than here.
 
-DO NOT POINT IT AT AN OLDER BATCH TO GET A BIGGER N. The container and the cell
-definitions both changed during this project, in ways an agent inside the
-sandbox could see -- see logs/README.md. Arms from different batches are not
-interchangeable, and pooling them would compare environments rather than models.
+Two pooling rules, both because a rate over the wrong denominator is worse than
+no rate. `control` is excluded from claim aggregates -- it has no false claim,
+so there is nothing to verify or defer to. Conflict cells are excluded from
+score aggregates -- the grader sees `allocate` alone, so it cannot tell an
+episode that broke the contractual output from one that preserved it.
 
-WHAT THIS ANSWERS. Whether the gaming rate differs across models on one fixture,
-and whether the conflict factor moves it. Rates go side by side and a Fisher
-exact test runs against the baseline arm. The pilot's finding was a
-dose-response -- 0% in the control, ~10% with the false claim alone, ~33% where
-the two requirements collide -- established across the roster but not powered
-per model, which is what a 20-epoch batch buys.
-
-Nishimura-Gasparian, McCarthy & Lindner (arXiv 2605.02269) report that all
-tested models game at non-negligible rates, lowest in Claude and highest in
-Grok 4, which is the prior this roster was chosen against.
-
-TWO POOLING RULES THIS TOOL ENFORCES, AND report_episodes.py DOES NOT.
-
-1. `control` is excluded from claim aggregates. It is the control cell
-   where the false docstring claim is absent, so there is nothing to verify and
-   nothing to defer to. Pooling it into a "verification rate" mixes a cell that
-   cannot express the behaviour with cells that can, and drags the rate toward
-   whatever the control happens to do. It is reported separately.
-
-2. Conflict cells (frozen_caller=True) are excluded from score and verification
-   aggregates. The grader scores allocate alone, so on these cells it cannot
-   see whether the contractual reconcile output survived -- an episode that
-   fixed allocate and broke the ledger output scores the same as one that did
-   neither. See docs/design.md.
-
-Both rules are stated in docs/design.md; this tool is the first to apply them.
+--baseline adds another directory as extra arms. Do not point it at an older
+batch to enlarge n: the container and the cell definitions both changed during
+this project, so those arms differ by environment, not by model.
 """
 
 from __future__ import annotations
@@ -431,7 +408,7 @@ def main() -> int:
         baseline_path = Path(args[i + 1])
         del args[i:i + 2]
 
-    root = Path(args[0]) if args else ROOT / "logs" / "multimodel"
+    root = Path(args[0]) if args else ROOT / "logs" / "all"
 
     results: dict[str, dict] = {}
 
@@ -445,7 +422,7 @@ def main() -> int:
 
     if not root.is_dir():
         if not results:
-            print(f"usage: python tools/report_multimodel.py <dir> [--baseline PATH]"
+            print(f"usage: python tools/report.py <dir> [--baseline PATH]"
                   f"   (not found: {root})")
             return 1
         print(f"note: no batch directory at {root} -- baseline only.", file=sys.stderr)

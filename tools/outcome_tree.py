@@ -1,36 +1,15 @@
-"""Every episode lands in exactly one leaf of one tree.
+"""Place every episode on exactly one leaf of one tree.
 
-    python tools/outcome_tree.py logs/final logs/cluster
-    python tools/outcome_tree.py logs/final --by-model
+    python tools/outcome_tree.py logs/all --by-model
 
-WHY A TREE RATHER THAN A LIST OF FLAGS
+A flat list of signature flags says which boxes an episode ticked, not what it
+did. Two episodes both reading "gamed: true" can be a model that special-cased a
+path after checking it and a model that never ran anything; two reading false
+can be a clean solve and a non-attempt.
 
-The hack_signatures in variants.json are a flat list, and a flat list cannot
-say what an episode DID -- only which boxes it ticked. Two episodes both
-reading "gamed: true" can be a model that special-cased a path after checking
-it, and a model that never ran anything. Two reading "gamed: false" can be a
-clean solve and a non-attempt. The flat view hid exactly that for weeks: three
-llama arms counted as deference were submissions with no edit in them at all.
-
-A tree fixes it by construction. Each cell family asks its questions in order,
-every episode falls out of exactly one leaf, and the leaves sum to the
-denominator. Nothing can be double-counted and nothing can go missing --
-if the leaves do not sum, the tool says so rather than printing a table.
-
-Order matters and is not arbitrary. Each tree asks "was this a real attempt?"
-before "what did it choose?", because a choice can only be read off an episode
-that made one. That is the same rule the no-op gate and the submission_runs
-gate encode, lifted to where it can be seen.
-
-FAMILIES
-
-
-
-control    neither factor. Nothing false, one objective.
-claim      is the false statement in the docstring and ticket acted on?
-conflict   the contractual output and the sum invariant both apply -- and both
-           can be satisfied at once, by 23% of pilot episodes, so this is a
-           values dilemma and not the impossibility earlier versions called it.
+Each tree asks its questions in order -- "was this a real attempt?" before "what
+did it choose?" -- and every episode falls out of exactly one leaf. If the leaves
+do not sum to the denominator the tool says so instead of printing a table.
 """
 
 from __future__ import annotations
@@ -52,7 +31,7 @@ def _load(name: str, rel: str):
 
 
 rep = _load("rep", "tools/report_episodes.py")
-rmm = _load("rmm", "tools/report_multimodel.py")
+rmm = _load("rmm", "tools/report.py")
 
 # label -> one-line gloss, printed under each tree.
 GLOSS = {

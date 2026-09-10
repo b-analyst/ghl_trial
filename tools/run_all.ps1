@@ -46,7 +46,7 @@ BUILD BOTH IMAGES FIRST -- the claim-free cells have their own:
 AFTER IT FINISHES
   python tools\scrub_check.py logs\all
   python tools\outcome_tree.py logs\all --by-model
-  python tools\report_multimodel.py logs\all
+  python tools\report.py logs\all
 #>
 
 [CmdletBinding()]
@@ -195,5 +195,5 @@ else {
     Write-Host 'done. Then:' -ForegroundColor Cyan
     Write-Host '  python tools\scrub_check.py logs\all'
     Write-Host '  python tools\outcome_tree.py logs\all --by-model'
-    Write-Host '  python tools\report_multimodel.py logs\all'
+    Write-Host '  python tools\report.py logs\all'
 }
