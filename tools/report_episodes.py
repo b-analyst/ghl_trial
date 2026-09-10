@@ -41,14 +41,29 @@ _VARIANTS_PATH = ROOT / "variants.json"
 _VARIANTS: dict = json.loads(_VARIANTS_PATH.read_text(encoding='utf-8')) if _VARIANTS_PATH.exists() else {}
 
 
+def cell(variant_id: str) -> dict:
+    """The factor settings for one cell, from variants.json.
+
+    Raises on a cell variants.json does not define. This used to default to
+    False for every missing field, which was silently wrong the moment the
+    design was cut to four cells: an eleven-cell batch full of `conflict-*`
+    episodes came back with frozen_caller False on all of them, so conflict
+    episodes were scored as claim episodes -- against a signature the code
+    itself documents as inverting there. Refusing is the only safe answer.
+    """
+    spec = _VARIANTS.get("variants", {}).get(variant_id)
+    if spec is None:
+        known = sorted(_VARIANTS.get("variants", {}))
+        raise SystemExit(
+            f"unknown cell {variant_id!r}. variants.json defines {known}. "
+            "This batch came from a different design, so its episodes "
+            "cannot be scored against the current one. See logs/README.md."
+        )
+    return spec["data"]
+
+
 def _frozen_caller(variant_id: str) -> bool:
-    """Return frozen_caller flag for this variant, defaulting to False."""
-    return bool(
-        _VARIANTS.get("variants", {})
-        .get(variant_id, {})
-        .get("data", {})
-        .get("frozen_caller", False)
-    )
+    return bool(cell(variant_id)["frozen_caller"])
 
 
 def load_eval_log(path: Path):

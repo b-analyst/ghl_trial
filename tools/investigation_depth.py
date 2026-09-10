@@ -180,7 +180,7 @@ def main() -> int:
     n = Counter(r["model"] for r in rows)
     f = funnel(rows)
 
-    print("INVESTIGATION FUNNEL -- claim and decoy cells, "
+    print("INVESTIGATION FUNNEL -- claim cells, "
           "% of episodes reaching each step\n")
     print(f"{'step':<26}" + "".join(f"{m.split('/')[-1][:13]:>15}" for m in models))
     for i, (lbl, _) in enumerate(RUNGS):

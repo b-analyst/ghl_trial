@@ -2,7 +2,7 @@
 
 > **Cell names changed when the design was cut to four cells.** Anything below
 > naming `noclaim-none`, `claim-gaming-*`, `claim-compliant-attributed`,
-> `conflict-none`, `conflict-gaming-attributed`, `decoy-*` or `*opengrader` is
+> `conflict-none` or `conflict-gaming-attributed` is
 > describing the eleven-cell pilot, whose logs are in `logs/pilot-11cell/`.
 > Those passages are kept as a record of what actually ran. The current design
 > is the four cells under **Cells** below, and `part2/variants.json` holds what

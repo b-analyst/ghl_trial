@@ -73,7 +73,6 @@ python tools/check_detectors.py    # detectors against known-answer cases
 python tools/check_bands.py        # reference scores 1.0, the trap scores 0.0,
                                    # and the visible checker passes both
 python tools/test_investigation_depth.py
-python part2/test_open_scorer.py   # Part 2 detector, not on this experiment's path
 ```
 
 `check_cells.py` is the one to run first -- its output *is* the design:
