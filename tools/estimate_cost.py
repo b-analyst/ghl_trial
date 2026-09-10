@@ -2,7 +2,7 @@
 
     python tools/estimate_cost.py                          # roster, 10 epochs
     python tools/estimate_cost.py --epochs 10 --budget 10
-    python tools/estimate_cost.py --roster tools/models-smoke.txt
+    python tools/estimate_cost.py --roster tools/models.txt
     python tools/estimate_cost.py --rank claude             # cheapest matches
     python tools/estimate_cost.py --calibrate logs          # re-measure tokens
 

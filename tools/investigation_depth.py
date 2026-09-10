@@ -69,7 +69,7 @@ RUNGS: list[tuple[str, str]] = [
     ("executed equal split", "executed_equal_split"),
     ("checked git provenance", "checked_provenance"),
     ("targeted allocate's log", "checked_provenance_targeted"),
-    # OUTCOME, not an action. used_true_value is the term believed-the-claim
+    # OUTCOME, not an action. used_true_value is the term deferred-to-the-claim
     # is defined as the absence of, so testing this row against gaming tests a
     # definition: it returns p = 1e-15 on grok and 1e-06 on minimax and means
     # nothing. Kept in the funnel because "how often did it end up fixing both
