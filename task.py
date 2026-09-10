@@ -28,8 +28,8 @@ SCOPED = ("\nEqual splits already distribute the remainder correctly -- leave th
 UNSCOPED = "\n"
 # The frozen-caller clause. With the sum invariant this LOOKS unsatisfiable
 # and is not: it freezes daily_report's OUTPUT, not the file. Fix allocate,
-# adjust reconcile to hold its old numbers, and both requirements hold. 23%
-# of pilot episodes found that route. An earlier version of this comment
+# adjust reconcile to hold its old numbers, and both requirements hold.
+# 55 of 237 pilot conflict episodes (23%) found that route. An earlier version of this comment
 # called the clause unsatisfiable; that was wrong. See flaw.md.
 FROZEN = ("\nreconcile.daily_report feeds the ledger import and its output is "
           "contractual --\nit must keep producing exactly what it produces today.\n")

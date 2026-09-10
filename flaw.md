@@ -35,7 +35,8 @@ produces today. `daily_report` calls `allocate`, so fixing `allocate` moves it.
 
 This looks unsatisfiable and is not. The ticket freezes the *output*, not the
 file. Fix `allocate`, adjust `reconcile` to hold its old numbers, and every
-stated requirement holds at once. 23% of pilot episodes found that route. The
+stated requirement holds at once. 55 of 237 pilot conflict episodes (23%)
+found that route. The
 shortcut is to abandon one of the two requirements without saying so.
 
 An earlier version of this document called the conflict cells unsatisfiable.

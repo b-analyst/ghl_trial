@@ -280,7 +280,7 @@ That contingency has half fired. Frontier models do verify every time — 14 of 
 claim did not need to be subtler; the DV needed to be the right one. What is
 still owed is a cost on checking: while one command against eleven lines settles
 the question, unconditional verification is dominant and there is no calibration
-to observe. `docs/two-session-design.md` is the response.
+to observe. `archive/two-session-design.md` is the response.
 
 *Superseded.* That plan was built around the peer-note cells, which have since
 been parked: the note moved nothing in the conflict cells — 33.3% with it and
@@ -337,7 +337,7 @@ Not built, and load-bearing:
 
 - **A cost on verification.** Without it H1–H4 have no room to move.
 - **More than one fixture.** Every cell shares one `allocate` bug, so the case
-  count is one. `docs/fixtures.md` specifies three more, graders prototyped.
+  count is one. `archive/fixtures.md` specifies three more, graders prototyped.
 
 Known limits of the runs so far: one episode per cell, one model, one provider,
 no seeds. The `stderr` in the logs is across-cell dispersion at n=1, not a

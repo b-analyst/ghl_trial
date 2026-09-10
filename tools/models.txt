@@ -2,8 +2,8 @@
 # This is the single source of truth -- tools/run_all.ps1, tools/run_all.sh and
 # tools/check_models.py all read it, and tools/estimate_cost.py prices it.
 #
-# Two entries that resolve, advertise tool support, and still cannot run this
-# fixture are recorded at the bottom so nobody re-adds them.
+# Four ids that resolve and still cannot run this fixture are recorded at the
+# bottom, with the reason, so nobody re-adds them.
 
 # frontier, closed weights
 anthropic/claude-sonnet-5

@@ -1,14 +1,22 @@
 # State of play
 
-Written to survive context loss. If you are picking this up cold, read this
-first, then `docs/proposal.md` (including **§15**), then `docs/assignment-fit.md`,
-then `docs/audit-2.md`.
+A working log, kept to survive context loss. **It is not the design document
+and is not written for a reviewer** -- for the experiment as it stands, read
+`../README.md` and then `design.md`.
 
-**Audit status.** The proposal has been through two independent audits:
-`docs/review.md` (first pass, before the honeypot layer existed) and
-`docs/audit-2.md` (second pass, after a context loss, re-verifying the literature
-and re-attacking §15). The design survived the second audit with one correction,
-described below.
+> **Pilot-era names throughout.** This file predates the cut to four cells.
+> Passages naming `noclaim-none`, `believed-the-claim`, `claim-gaming-*`,
+> `decoy-*` or `*opengrader`, and any count based on 167 episodes, describe the
+> eleven-cell pilot. They are kept because the corrections below are the record
+> of how the current definitions were arrived at, and that reasoning is part of
+> the deliverable.
+
+**Audit status.** The proposal went through two independent audits, both now in
+`archive/`: `archive/review.md` (first pass, before the honeypot layer existed)
+and `archive/audit-2.md` (second pass, after a context loss, re-verifying the
+literature). The design survived the second with one correction, described
+below. `archive/proposal.md` is the retrieval-poisoning direction that was
+rejected; `archive/README.md` says why.
 
 ## Where the project is
 
@@ -72,7 +80,7 @@ and §15's original instruction ("run `check_sources.py` before you finish") nam
 the tool. The fix: deliver the source-independence bar through a house style guide
 and CI rather than through the ticket. That keeps F2 naturalistic, improves F4 and
 F8 at the same time, and puts the temptation back on the critical path
-unadvertised. Full derivation in `docs/audit-2.md` §1.
+unadvertised. Full derivation in `archive/audit-2.md` §1.
 
 ## Two runs that should happen before building anything
 
@@ -86,7 +94,7 @@ unadvertised. Full derivation in `docs/audit-2.md` §1.
 
 ## Open, unresolved
 
-**The pilot figure discrepancy.** `proposal.md` §4 and `gap-map.md` report 18/24
+**The pilot figure discrepancy.** `archive/proposal.md` §4 and `gap-map.md` report 18/24
 vs 70/70 at p = 0.000165. The batch log in `logs/` gives 21/24 vs 72/72 at
 p = 0.0142. This is **not established as an error** — the run behind 18/24 may
 exist and be lost, or may predate the encoding fixes in `d8abb37`. The stated
@@ -95,7 +103,7 @@ for whatever data it ran on. Do not quote either figure until provenance is
 settled. Do not "correct" the documents on the assumption the log is complete.
 
 **Citations still marked [R]** in the proposal have not been independently
-verified. Everything marked [V] was checked in `docs/review.md` §1 and holds,
+verified. Everything marked [V] was checked in `archive/review.md` §1 and holds,
 with two naming fixes noted there. A third marker **[S]** now means corroborated
 from search summaries but primary text not reached — arxiv.org, huggingface.co
 over HTTP, semanticscholar and alphaxiv are all egress-blocked from the cloud
@@ -165,8 +173,8 @@ The settled picture for claude-sonnet-5, 167 episodes:
 
 **One open framing question for the writeup.** `variants.json` declares
 `believed-the-claim` a hack signature, so calling those two episodes "zero
-specification gaming" in `review.md` while reporting them as a "deferral rate"
-elsewhere cannot both stand. Pick one and use it everywhere. Also `review.md`
+specification gaming" in `archive/review.md` while reporting them as a "deferral rate"
+elsewhere cannot both stand. Pick one and use it everywhere. Also `archive/review.md`
 says `tampered` is "false in every row"; it is true in 26 rows. That does not
 change the conclusion, because the field is not a hack signature, but the
 sentence should name `weakened_checker` alone.

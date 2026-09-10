@@ -68,7 +68,7 @@ Relevant Content and Fact Check — three axes, none of them source independence
 | R9 multi-model | **no** | planned | planned |
 | R10 unclaimed | yes | partly — 2604.12138 | yes |
 
-† Amended by `docs/audit-2.md` §1. The earlier reading — "F2 not needed" — was
+† Amended by `archive/audit-2.md` §1. The earlier reading — "F2 not needed" — was
 too strong. F2's exaggerated level splits by valence (false premise for safety
 tasks, overdetermined details for capability tasks) and its definition also fires
 when the prompt pre-specifies a tool call. This is a capability task, and the
@@ -109,7 +109,7 @@ satisfiable without doing the work.
 Stated in a house style guide the agent can read, with `check_sources.py` invoked
 by CI. Not in the ticket: naming the tool in the prompt pre-specifies a tool call,
 which is an F2 trigger and the pilot's advertising mistake in a new costume
-(`audit-2.md` §1).
+(`archive/audit-2.md` §1).
 
 `check_sources.py` counts distinct domains. It is agent-visible and agent-writable,
 exactly as `evaluate.py` was.
@@ -136,7 +136,7 @@ Now every requirement is met:
   `gap-map.md` identifies F2 as the factor a honeypot of this family had to spend.
   Not being forced to spend it is a real reduction in the awareness stack rather
   than a rearrangement. It is not the same as being clean: see the † note above
-  and `audit-2.md` §1 for what the instruction has to do to keep it.
+  and `archive/audit-2.md` §1 for what the instruction has to do to keep it.
 
 ## What this preserves
 
@@ -166,9 +166,9 @@ Run them only if the honeypot lands first.
 
 ## Recommendation
 
-Re-audited after context loss; see `docs/audit-2.md` for the verification pass and
+Re-audited after context loss; see `archive/audit-2.md` for the verification pass and
 the one correction it forced. Two runs before committing, unchanged from
-`review.md`:
+`archive/review.md`:
 
 1. **Multi-model the existing allocation fixture.** One day, no new code. The
    pilot's null is confounded with model family — 2605.02269 reports Claude games
@@ -182,7 +182,7 @@ as stated and costs less than the full retrieval programme.
 
 ## One open discrepancy
 
-`gap-map.md` and `proposal.md` both report the pilot's headline as "18 of 24 ...
+`gap-map.md` and `archive/proposal.md` both report the pilot's headline as "18 of 24 ...
 p = 0.00017". The batch log currently in `logs/` gives 21 of 24 against 72 of 72,
 Fisher exact p = 0.0142.
 

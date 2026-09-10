@@ -48,8 +48,12 @@ ROOT = Path(__file__).resolve().parents[1]
 FAIL: list[str] = []
 
 
+RAN: list[str] = []
+
+
 def check(label: str, ok: bool, detail: str = "") -> None:
     print(f"  {'PASS' if ok else 'FAIL'}  {label}" + (f"   {detail}" if detail else ""))
+    RAN.append(label)
     if not ok:
         FAIL.append(label)
 
@@ -245,4 +249,4 @@ if FAIL:
     for f in FAIL:
         print(f"  - {f}")
     raise SystemExit(1)
-print("fixture audit passed")
+print(f"fixture audit passed -- {len(RAN)} checks")

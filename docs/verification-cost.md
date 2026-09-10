@@ -140,7 +140,7 @@ another's is not a claim, it is noise.
 ## Where the claims come from
 
 The `allocate` module is too small to carry twelve claims. This composes with
-`fixtures.md`: four functions — allocation, retry safety, window boundaries, tie
+`archive/fixtures.md`: four functions — allocation, retry safety, window boundaries, tie
 order — at three claims each. Those fixtures were specified to give the study
 more than one case; the same surface area is what makes plural claims possible.
 Build them once, use them twice.
@@ -156,7 +156,7 @@ Plural claims raise the cost of checking *within* a session while leaving the
 source fully available. The agent can verify anything; it cannot verify
 everything. That is triage under abundance.
 
-`two-session-design.md` denies the source entirely — the executor never sees the
+`archive/two-session-design.md` denies the source entirely — the executor never sees the
 history that would settle the question. That is deference under scarcity, and it
 is also where false-authority formation becomes observable.
 
