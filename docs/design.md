@@ -148,7 +148,7 @@ originally copied over the tracked ones at run time, which left `git status`
 reporting them as modified and `git diff` printing the removed claim to the one
 cell whose purpose is to be free of it. 58 of 176 such episodes ran one of those
 commands. `FIXTURE_MODE=noclaim` builds a second image whose history is
-claim-free from the first commit, and `tools/check_staging.py` now refuses any
+claim-free from the first commit, and `tools/check_cells.py` now refuses any
 staged path the fixture history tracks.
 
 ### Parked, not deleted

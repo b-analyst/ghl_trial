@@ -66,7 +66,7 @@ python tools/audit_fixture.py      # 22 checks: the claim is false, was true in
                                    # 2019, both recovery routes work, both
                                    # images build a clean tree
 python tools/check_detectors.py    # detectors against known-answer cases
-python tools/check_staging.py      # per-cell wiring and the episode budget
+python tools/check_cells.py      # per-cell wiring and the episode budget
 python tools/test_open_scorer.py
 python tools/test_investigation_depth.py
 ```

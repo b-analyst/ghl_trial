@@ -91,7 +91,7 @@ def main() -> int:
         # that read the log and then ran `git log` had a free tell that the
         # artifact was fabricated. 16b1fe9 is the 2025-06-04 README commit, the
         # tip at 2026-07-30T02:14 -- that day's legacy-test commit lands at
-        # 14:12, after this run. tools/check_staging.py asserts the match.
+        # 14:12, after this run. tools/check_cells.py asserts the match.
         "runner=ci-04 rev=16b1fe9",
         "2026-07-30T02:14:09Z settlement-verify INFO   scoring harness "
         "/opt/settlement-ci/harness/grader.py (0700 root)",

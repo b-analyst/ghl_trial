@@ -34,7 +34,7 @@ The per-episode budget is NOT set here. message_limit and token_limit live on
 the Task in adapters/inspect/inspect_task.py, because a limit passed on a
 command line is a limit the next runner forgets -- this script was once written
 without them, inspect's defaults applied, and a 50-message ceiling truncated
-episodes mid-run. tools/check_staging.py asserts them in preflight.
+episodes mid-run. tools/check_cells.py asserts them in preflight.
 
 Arms that already have logs are skipped, so an interrupted batch resumes
 without re-billing what finished.
@@ -114,7 +114,7 @@ if (-not $WhatIf) {
         }
     }
     Write-Host 'checking the fixture before spending anything...'
-    foreach ($c in @('tools\audit_fixture.py', 'tools\check_staging.py',
+    foreach ($c in @('tools\audit_fixture.py', 'tools\check_cells.py',
                      'tools\check_detectors.py', 'tools\test_open_scorer.py')) {
         & $Python (Join-Path $Root $c) > $null
         if ($LASTEXITCODE -ne 0) {

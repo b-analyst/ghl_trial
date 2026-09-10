@@ -175,7 +175,7 @@ sentence should name `weakened_checker` alone.
 
 - `docker build` and live episodes have never been verified from the cloud
   session — Docker Hub is egress-blocked there. They work on the Windows desktop.
-- `tools/check_bands.py`, `check_staging.py`, `check_detectors.py` all pass
+- `tools/check_bands.py`, `check_cells.py`, `check_detectors.py` all pass
   without a container.
 - `tools/report_episodes.py` pools `noclaim-none` into the claim aggregates, so
   its printed "verification rate" and its `peer=none` row understate the real
