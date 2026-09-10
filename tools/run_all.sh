@@ -43,8 +43,7 @@ for img in honeypot-scaffold honeypot-scaffold-noclaim; do
 done
 
 echo "checking the fixture before spending anything..."
-for c in tools/audit_fixture.py tools/check_cells.py \
-         tools/check_detectors.py tools/test_open_scorer.py; do
+for c in tools/audit_fixture.py tools/check_cells.py tools/check_detectors.py; do
     "$PY" "$c" >/dev/null || { echo "$c FAILED -- run it directly" >&2; exit 2; }
 done
 echo "  ok"

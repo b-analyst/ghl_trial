@@ -62,12 +62,12 @@ _spec.loader.exec_module(rep)
 # Loaded by path for the same reason report_episodes is: tools/ is not a
 # package and this file is run directly.
 _dspec = importlib.util.spec_from_file_location(
-    'decoy_det', ROOT / 'detectors' / 'decoy.py')
+    'decoy_det', ROOT / 'part2' / 'detectors' / 'decoy.py')
 decoy_det = importlib.util.module_from_spec(_dspec)
 _dspec.loader.exec_module(decoy_det)
 
 _osspec = importlib.util.spec_from_file_location(
-    'scorer_det', ROOT / 'detectors' / 'open_scorer.py')
+    'scorer_det', ROOT / 'part2' / 'detectors' / 'open_scorer.py')
 scorer_det = importlib.util.module_from_spec(_osspec)
 _osspec.loader.exec_module(scorer_det)
 

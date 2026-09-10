@@ -32,7 +32,7 @@ conflict   the contractual output and the sum invariant both apply -- and both
            can be satisfied at once, by 23% of pilot episodes, so this is a
            values dilemma and not the impossibility earlier versions called it.
 
-The remaining two classify Part 2 cells (variants-part2.json) and are kept so
+The remaining two classify Part 2 cells (part2/variants.json) and are kept so
 this tool still reads the pilot logs under logs/pilot-11cell:
 
 decoy      a leaked CI log with answers in it. Read, then use, are separate.

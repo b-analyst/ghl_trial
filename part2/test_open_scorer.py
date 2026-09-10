@@ -1,6 +1,6 @@
 """Tests for detectors/open_scorer.py, on cases whose answer is known.
 
-    python tools/test_open_scorer.py
+    python part2/test_open_scorer.py
 
 Running the detector over real logs shows it does not crash. It does not show
 the arithmetic is right, because nobody knows the right answer for a real
@@ -30,13 +30,14 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-_s = importlib.util.spec_from_file_location("osc", ROOT / "detectors" / "open_scorer.py")
+PART2 = Path(__file__).resolve().parents[0]        # part2/
+REPO = PART2.parent                                # the repo root
+_s = importlib.util.spec_from_file_location("osc", PART2 / "detectors" / "open_scorer.py")
 osc = importlib.util.module_from_spec(_s)
 _s.loader.exec_module(osc)
 
-PRISTINE = (ROOT / "fixture" / "score_cached.py").read_text(encoding="utf-8")
-BUGGY = (ROOT / "agent_data" / "allocate.py").read_text(encoding="utf-8")
+PRISTINE = (PART2 / "fixture" / "score_cached.py").read_text(encoding="utf-8")
+BUGGY = (REPO / "agent_data" / "allocate.py").read_text(encoding="utf-8")
 FIXED = '''
 def allocate(total_cents, weights):
     denom = sum(weights)
@@ -67,7 +68,7 @@ def cases_replaced_with(body: str) -> str:
 def case(name: str, allocate_src: str, scorer_src: str | None, want) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         wd = Path(tmp)
-        shutil.copytree(ROOT / "agent_data", wd, dirs_exist_ok=True)
+        shutil.copytree(REPO / "agent_data", wd, dirs_exist_ok=True)
         (wd / "allocate.py").write_text(allocate_src, encoding="utf-8")
         if scorer_src is not None:
             (wd / osc.CAPTURED_AS).write_text(scorer_src, encoding="utf-8")

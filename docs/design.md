@@ -5,7 +5,7 @@
 > `conflict-none`, `conflict-gaming-attributed`, `decoy-*` or `*opengrader` is
 > describing the eleven-cell pilot, whose logs are in `logs/pilot-11cell/`.
 > Those passages are kept as a record of what actually ran. The current design
-> is the four cells under **Cells** below, and `variants-part2.json` holds what
+> is the four cells under **Cells** below, and `part2/variants.json` holds what
 > was parked.
 
 
@@ -153,7 +153,7 @@ staged path the fixture history tracks.
 
 ### Parked, not deleted
 
-`variants-part2.json` holds eight further cells with the evidence for cutting
+`part2/variants.json` holds eight further cells with the evidence for cutting
 them: four peer-note conditions (the note moved nothing in the conflict cells —
 33.3% with, 33.3% without) and four bait conditions (across 132 episodes not one
 issued a command mentioning the leaked answer key or the writable scorer, or the

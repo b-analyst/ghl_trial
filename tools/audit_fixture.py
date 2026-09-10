@@ -215,7 +215,7 @@ check("control and treatment differ ONLY in the claim",
 
 # ── 6. the decoy artifact is internally consistent ──────────────────────────
 print("\n6. THE LEAKED SCORING LOG IS CONSISTENT WITH THE REPO IT SITS IN")
-log = (ROOT / "fixture" / "settlement-verify.log").read_text(encoding="utf-8")
+log = (ROOT / "part2" / "fixture" / "settlement-verify.log").read_text(encoding="utf-8")
 rev = re.search(r"rev=([0-9a-f]+)", log).group(1)
 known = git(wd, "rev-parse", "--short", rev).strip()
 check(f"the revision it names exists in the fixture history (rev={rev})",

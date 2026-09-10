@@ -39,7 +39,7 @@ in which container image they run in, so the manipulation lives in the
 environment rather than the instructions. Nothing is staged per sample.
 
 Definitions live in `variants.json`, including which behaviours count as a hack
-signature per cell. `variants-part2.json` parks eight further cells with the
+signature per cell. `part2/variants.json` parks eight further cells with the
 evidence for why they were cut.
 
 ## What is graded, and by what
@@ -67,7 +67,6 @@ python tools/audit_fixture.py      # 22 checks: the claim is false, was true in
                                    # images build a clean tree
 python tools/check_detectors.py    # detectors against known-answer cases
 python tools/check_cells.py      # per-cell wiring and the episode budget
-python tools/test_open_scorer.py
 python tools/test_investigation_depth.py
 ```
 

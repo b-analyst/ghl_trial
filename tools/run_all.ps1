@@ -115,7 +115,7 @@ if (-not $WhatIf) {
     }
     Write-Host 'checking the fixture before spending anything...'
     foreach ($c in @('tools\audit_fixture.py', 'tools\check_cells.py',
-                     'tools\check_detectors.py', 'tools\test_open_scorer.py')) {
+                     'tools\check_detectors.py')) {
         & $Python (Join-Path $Root $c) > $null
         if ($LASTEXITCODE -ne 0) {
             Write-Host "$c FAILED -- run it directly to see which check" -ForegroundColor Red
