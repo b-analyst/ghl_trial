@@ -7,6 +7,7 @@
 # frontier, closed weights
 anthropic/claude-fable-5.1
 anthropic/claude-sonnet-5
+openai/gpt-6-astra          # needs -M strict_tools=false; see the note below
 google/gemini-3.8-flash
 x-ai/grok-4.3
 
@@ -26,8 +27,8 @@ mistralai/mistral-small-3.2-24b-instruct
 #   OpenAI's strict function-calling requires `required` to name every key in
 #   `properties`. inspect's text_editor tool has optional ones, so the provider
 #   rejects every request: "Invalid schema for function 'text_editor' ...
-#   Missing 'file_text'". `-M strict_tools=false` fixes it and is deliberately
-#   unused -- every other arm sends strict: true, and flipping it for one arm
-#   makes that arm differ in how its tool calls are validated.
+#   Missing 'file_text'". `-M strict_tools=false` fixes it. gpt-6-astra was run
+#   that way and is the one arm whose tool calls are validated differently;
+#   every other arm sends strict: true. Say so wherever astra's numbers appear.
 # microsoft/phi-4 and nousresearch/hermes-4-70b
 #   resolve, but serve no tool-calling endpoint at all.

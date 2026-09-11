@@ -56,18 +56,32 @@ first model of any new kind is a probe.
 Every batch leaves `logs/all/ledger.txt`, and it carries two kinds of line:
 
 ```
-2026-09-11T04:45:02  billed  before batch                             usage=$12.34
-2026-09-11T05:10:41  billed  after openai/gpt-oss-120b                usage=$12.55  delta=$0.21
-2026-09-11T05:10:44  spent   openai/gpt-oss-120b                        99 ep  in=4,514,976 cached=0 out=247,326  $0.21
-2026-09-11T05:10:44  spent   TOTAL                                      99 ep  in=4,514,976 cached=0 out=247,326  $0.21
+2026-09-11T00:14:53  billed  before batch                             usage=$130.20  delta=$0.11
+2026-09-11T00:31:00  billed  after openai/gpt-6-astra                 usage=$161.24  delta=$31.04
+2026-09-11T00:31:08  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
+2026-09-11T00:31:08  spent   TOTAL                                     399 ep  in=12,124,763 cached=5,000,714 out=1,678,767  $158.71
 ```
 
 `billed` is OpenRouter's own usage counter for the key, read before the batch
 and after every arm; the delta between consecutive lines is what that arm
-actually cost. `spent` is the tokens in the logs priced at live rates. The
+actually cost. `spent` is the tokens in the logs priced at live rates, and it is
+cumulative over everything under the directory, not just the arm that ran. The
 runners write both. When they disagree by more than pennies, the billed figure
 is the true one and the gap is worth understanding -- reasoning tokens billed
 as output, or a provider fee the catalogue does not show.
+
+On this run they disagreed by about a tenth, in both directions:
+
+| arm | billed | from the tokens |
+|---|---:|---:|
+| fable 5.1, 150 episodes | $115.62 | $128.61 |
+| gpt-6-astra, 150 episodes | $32.03 | $29.90 |
+
+Two other things the `billed` lines show. A `before batch` delta is everything
+the key spent since the last reading, which includes work that has nothing to do
+with this repo, so it is not a batch cost. And an arm that reached no model at
+all still gets a line: astra's first attempt was rejected by the provider before
+a request landed, and reads `delta=$-0.00`.
 
 To account for a batch after the fact:
 
@@ -104,6 +118,17 @@ powershell -ExecutionPolicy Bypass -File .\run.ps1 -Epochs 10 -Append -Models an
 
 Epoch numbers restart at 1 in the second file. Nothing keys on them.
 
+OpenAI models reject Inspect's `text_editor` schema under strict function
+calling. Pass `-ModelArgs strict_tools=false` (`MODEL_ARGS=` for the shell
+runner) for those, and probe with a single epoch before committing a batch:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run.ps1 -Epochs 1 -Models openai/gpt-6-astra -ModelArgs strict_tools=false
+```
+
+An arm run that way differs from the others in how its tool calls are validated.
+Say so wherever its numbers are quoted.
+
 The task path must stay relative: Inspect globs it and Python 3.14 refuses an
 absolute glob. The per-episode budget (600 messages, 4M tokens) is on the Task
 in `adapters/inspect/inspect_task.py`, not on the command line, so it cannot be
@@ -120,8 +145,10 @@ them.
 | 10 epochs | p = 0.21 | — |
 | 20 epochs | — | p = 0.0083 |
 
-Twenty is what a per-model claim needs. If the budget is tight, cut models
-before epochs.
+Thirty is what this run needed. At twenty per cell the goal contrast read
+p = 0.057 and looked like a near-miss; ten more epochs per cell turned it into a
+null (p = 0.71) and turned the phantom contrast into a real effect. If the
+budget is tight, cut models before epochs.
 
 ## Read the result
 
