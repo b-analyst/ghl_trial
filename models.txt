@@ -5,6 +5,7 @@
 # bottom, with the reason, so nobody re-adds them.
 
 # frontier, closed weights
+anthropic/claude-fable-5.1
 anthropic/claude-sonnet-5
 google/gemini-3.8-flash
 x-ai/grok-4.3
