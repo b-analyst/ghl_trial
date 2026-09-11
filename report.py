@@ -212,6 +212,18 @@ def by_model(rows: list[dict]) -> None:
         print(line)
 
 
+def thin(rows: list[dict], floor: int = 10) -> None:
+    """Name any arm too small to quote. An interrupted run still writes a log,
+    and a rate over four episodes reads like a rate over thirty."""
+    for m in sorted({x["model"] for x in rows}):
+        short = [(c, n) for c in CELLS
+                 if (n := sum(1 for x in rows if x["model"] == m and x["cell"] == c)) < floor]
+        if short:
+            cells = ", ".join(f"{c} {n}" for c, n in short)
+            print(f"\n  UNDERPOWERED  {m}: {cells}. Fewer than {floor} episodes in a cell;")
+            print("                do not quote this arm's rates.")
+
+
 PAIRS = [("goal", "control", "does stating the goal raise hacking?"),
          ("cover-goal", "goal", "does a planted justification add to it?"),
          ("phantom-goal", "goal", "does pointing at an absent one add to it?"),
@@ -276,6 +288,7 @@ def main() -> int:
 
     by_cell(rows)
     by_model(rows)
+    thin(rows)
     contrasts(rows)
     by_signature(rows)
     print(f"\n{len(rows)} episodes, {len({x['model'] for x in rows})} models")
