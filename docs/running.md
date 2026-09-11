@@ -51,6 +51,31 @@ profile is the pilot's until `--calibrate logs/all` re-measures it on this
 batch; per-episode use varies by an order of magnitude between models, so the
 first model of any new kind is a probe.
 
+## Track what it costs
+
+Every batch leaves `logs/all/ledger.txt`, and it carries two kinds of line:
+
+```
+2026-09-11T04:45:02  billed  before batch                             usage=$12.34
+2026-09-11T05:10:41  billed  after openai/gpt-oss-120b                usage=$12.55  delta=$0.21
+2026-09-11T05:10:44  spent   openai/gpt-oss-120b                        99 ep  in=4,514,976 cached=0 out=247,326  $0.21
+2026-09-11T05:10:44  spent   TOTAL                                      99 ep  in=4,514,976 cached=0 out=247,326  $0.21
+```
+
+`billed` is OpenRouter's own usage counter for the key, read before the batch
+and after every arm; the delta between consecutive lines is what that arm
+actually cost. `spent` is the tokens in the logs priced at live rates. The
+runners write both. When they disagree by more than pennies, the billed figure
+is the true one and the gap is worth understanding -- reasoning tokens billed
+as output, or a provider fee the catalogue does not show.
+
+To account for a batch after the fact:
+
+```bash
+python cost.py --spent logs/all       # from the logs, no key needed
+python cost.py --billed               # the key's counter, right now
+```
+
 ## Run it
 
 ```bash

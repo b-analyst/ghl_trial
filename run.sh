@@ -26,6 +26,9 @@ CELLS=$("$PY" -c "import json;print(len(json.load(open('variants.json'))['varian
 PER_MODEL=$((CELLS * EPOCHS))
 echo "$CELLS cells x $EPOCHS epochs = $PER_MODEL episodes per model"
 mkdir -p "$OUT"
+# The key's own spend counter, before and after every arm, so the ledger shows
+# what OpenRouter actually billed next to what the tokens compute to.
+"$PY" cost.py --billed --note "before batch" --ledger "$OUT/ledger.txt" || true
 
 for model in $(grep -v '^[[:space:]]*#' models.txt | grep -v '^[[:space:]]*$'); do
     dest="$OUT/$(printf '%s' "$model" | tr '/:.' '___')"
@@ -53,7 +56,10 @@ print(sum(1 for f in glob.glob('$dest/*.eval') for s in (read_eval_log(f).sample
     else
         echo "done   $model -- $n episodes"
     fi
+    "$PY" cost.py --billed --note "after $model" --ledger "$OUT/ledger.txt" || true
 done
 
+echo
+"$PY" cost.py --spent "$OUT" || true
 echo
 echo "then:  $PY scrub.py $OUT && $PY report.py $OUT"

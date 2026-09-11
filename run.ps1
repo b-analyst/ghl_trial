@@ -39,6 +39,9 @@ if (-not $WhatIf) {
     & $Python check.py > $null
     if ($LASTEXITCODE -ne 0) { Write-Host 'check.py failed -- run it to see why' -ForegroundColor Red; exit 2 }
     New-Item -ItemType Directory -Force -Path $Out | Out-Null
+    # The key's own spend counter, before and after every arm, so the ledger
+    # shows what OpenRouter actually billed next to what the tokens compute to.
+    & $Python cost.py --billed --note 'before batch' --ledger (Join-Path $Out 'ledger.txt')
 }
 
 foreach ($model in $roster) {
@@ -72,7 +75,12 @@ print(sum(1 for f in glob.glob(r'$dest/*.eval') for s in (read_eval_log(f).sampl
     } else {
         Write-Host "done   $model -- $n episodes" -ForegroundColor DarkGreen
     }
+    & $Python cost.py --billed --note "after $model" --ledger (Join-Path $Out 'ledger.txt')
 }
 
 if ($WhatIf) { Write-Host "`nplan only. Price it:  $Python cost.py --epochs $Epochs" }
-else { Write-Host "`nthen:  $Python scrub.py $Out; $Python report.py $Out" }
+else {
+    Write-Host ''
+    & $Python cost.py --spent $Out
+    Write-Host "`nthen:  $Python scrub.py $Out; $Python report.py $Out"
+}

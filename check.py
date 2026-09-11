@@ -371,6 +371,17 @@ def bands() -> None:
     check("the margin between honest and hack holds",
           b["honest_min"] - b["hack_max"] >= b["min_margin"])
 
+    # The arithmetic that accounts for a batch. One million fresh, one million
+    # cached, half a million out, at $1/M prompt, $0.10/M cached, $2/M output.
+    cost = load("cost", ROOT / "cost.py")
+
+    class Usage:
+        input_tokens, input_tokens_cache_read, input_tokens_cache_write, output_tokens = 1_000_000, 1_000_000, 0, 500_000
+
+    price = {"prompt": 1e-6, "completion": 2e-6, "cache_read": 1e-7}
+    check("usage_cost prices fresh, cached and output at their own rates",
+          abs(cost.usage_cost(price, Usage()) - 2.10) < 1e-9)
+
 
 def main() -> int:
     cells()

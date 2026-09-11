@@ -1,14 +1,19 @@
-"""Price a batch before spending the key on it, and check the roster resolves.
+"""Price a batch before running it, and account for it afterwards.
 
-    python cost.py --epochs 20                  price models.txt
+    python cost.py --epochs 20                  price models.txt before spending
     python cost.py --check                      every roster id resolves and serves tools
     python cost.py --search fable               find an id
     python cost.py --rank gemini                cheapest matches for a family
     python cost.py --calibrate logs/all         re-measure tokens from a finished batch
 
+    python cost.py --spent logs/all             what a batch cost, from its logs
+    python cost.py --billed                     what the key has spent, per OpenRouter
+    python cost.py --billed --note "after grok" ...and record it in the ledger
+
 Pricing is live from OpenRouter. The key is read from OPENROUTER_API_KEY and
-never printed. Cost is figured as input + cache_read + cache_write, because a
-provider that does not cache bills all of it.
+never printed. --spent prices the tokens in the logs; --billed reads the key's
+own usage counter. The runners write both to logs/all/ledger.txt, so the
+computed and the billed figure sit side by side for every arm.
 """
 
 from __future__ import annotations
@@ -16,6 +21,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 import urllib.request
 from pathlib import Path
 
@@ -63,6 +69,88 @@ def roster() -> list[str]:
 
 def episode_cost(price: dict, prompt: int, output: int) -> float:
     return prompt * price["prompt"] + output * price["completion"]
+
+
+def usage_cost(price: dict, u) -> float:
+    """Cost of one recorded ModelUsage. Cache reads at the cache rate, cache
+    writes at the prompt rate, which is what OpenRouter charges for most
+    providers."""
+    fresh = (u.input_tokens or 0) + (u.input_tokens_cache_write or 0)
+    cached = u.input_tokens_cache_read or 0
+    out = u.output_tokens or 0
+    cache_rate = price["cache_read"] or price["prompt"]
+    return fresh * price["prompt"] + cached * cache_rate + out * price["completion"]
+
+
+def ledger(path: Path, line: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')}  {line}\n")
+
+
+def spent(log_dir: Path, cat: dict) -> int:
+    """What a batch cost: tokens from every log under log_dir, at live prices."""
+    from inspect_ai.log import read_eval_log
+
+    totals: dict[str, dict] = {}
+    for p in sorted(log_dir.rglob("*.eval")):
+        log = read_eval_log(str(p))
+        mid = str(log.eval.model).replace("openrouter/", "")
+        t = totals.setdefault(mid, {"episodes": 0, "in": 0, "cached": 0, "out": 0, "cost": 0.0})
+        price = cat.get(mid)
+        t["priced"] = price is not None
+        for smp in log.samples or []:
+            t["episodes"] += 1
+            for u in (smp.model_usage or {}).values():
+                t["in"] += (u.input_tokens or 0) + (u.input_tokens_cache_write or 0)
+                t["cached"] += u.input_tokens_cache_read or 0
+                t["out"] += u.output_tokens or 0
+                if price:
+                    t["cost"] += usage_cost(price, u)
+    if not totals:
+        print(f"no logs under {log_dir}")
+        return 1
+
+    led = log_dir / "ledger.txt"
+    print(f"spent under {log_dir} -- tokens from the logs, prices live from OpenRouter\n")
+    print(f"  {'model':<42}{'episodes':>9}{'in':>13}{'cached':>11}{'out':>11}{'cost':>9}")
+    grand = {"episodes": 0, "in": 0, "cached": 0, "out": 0, "cost": 0.0}
+    for mid, t in sorted(totals.items()):
+        c = f"${t['cost']:.2f}" if t["priced"] else "?"
+        print(f"  {mid:<42}{t['episodes']:>9}{t['in']:>13,}{t['cached']:>11,}{t['out']:>11,}{c:>9}")
+        ledger(led, f"spent   {mid:<40} {t['episodes']:>4} ep  in={t['in']:,} cached={t['cached']:,} out={t['out']:,}  {c}")
+        for k in grand:
+            grand[k] += t[k]
+    print(f"  {'total':<42}{grand['episodes']:>9}{grand['in']:>13,}{grand['cached']:>11,}{grand['out']:>11,}{'$%.2f' % grand['cost']:>9}")
+    ledger(led, f"spent   {'TOTAL':<40} {grand['episodes']:>4} ep  in={grand['in']:,} cached={grand['cached']:,} out={grand['out']:,}  ${grand['cost']:.2f}")
+    unpriced = [m for m, t in totals.items() if not t["priced"]]
+    if unpriced:
+        print("  unpriced, not in the OpenRouter catalogue:", ", ".join(unpriced))
+    print(f"\nappended to {led}")
+    return 0
+
+
+def billed(note: str, led: Path) -> int:
+    """What OpenRouter says the key has spent, now. With a note, it goes in the
+    ledger with the change since the last billed line."""
+    try:
+        d = get("/key").get("data", {})
+    except Exception as exc:
+        print(f"could not read /key: {exc}")
+        return 2
+    usage = float(d.get("usage") or 0)
+    limit = d.get("limit")
+    print(f"billed: ${usage:.2f} used" + (f" of ${float(limit):.2f}" if limit else ""))
+    if note:
+        prev = None
+        if led.exists():
+            for line in led.read_text(encoding="utf-8").splitlines():
+                if "  billed  " in line and "usage=$" in line:
+                    prev = float(line.split("usage=$")[1].split()[0])
+        delta = f"  delta=${usage - prev:.2f}" if prev is not None else ""
+        ledger(led, f"billed  {note:<40} usage=${usage:.2f}{delta}")
+        print(f"appended to {led}")
+    return 0
 
 
 def calibrate(log_dir: Path) -> dict | None:
@@ -165,11 +253,17 @@ def main() -> int:
     def opt(flag, default=None):
         return args[args.index(flag) + 1] if flag in args and args.index(flag) + 1 < len(args) else default
 
+    if "--billed" in args:
+        return billed(opt("--note", ""), Path(opt("--ledger", "logs/all/ledger.txt")))
+
     try:
         cat = catalogue()
     except Exception as exc:
         print(f"could not reach OpenRouter: {exc}")
         return 2
+
+    if "--spent" in args:
+        return spent(Path(opt("--spent", "logs/all")), cat)
 
     prof = calibrate(Path(opt("--calibrate"))) or PROFILE if "--calibrate" in args else PROFILE
     if "--check" in args and "--search" not in args:

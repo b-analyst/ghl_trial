@@ -1,0 +1,2 @@
+2026-09-10T22:36:36  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-10T22:36:36  spent   TOTAL                                      99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
