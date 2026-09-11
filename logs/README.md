@@ -4,7 +4,7 @@ Inspect `.eval` logs, one directory per batch, one subdirectory per model.
 
 | directory | episodes | cells | status |
 |---|---|---|---|
-| `all/` | 399 | 5 | **This run.** Three models: fable 5.1 and gpt-6-astra at 30 epochs per cell, gpt-oss-120b at 20. |
+| `all/` | 549 | 5 | **This run.** Four models: fable 5.1, gpt-6-astra and qwen3.8-max at 30 epochs per cell, gpt-oss-120b at 20. |
 | `pilot-11cell/` | 402 | 11 | The earlier design on the same fixture. Every pilot number quoted in the docs comes from here. |
 
 Run `python scrub.py logs/all` before committing anything produced with a paid
