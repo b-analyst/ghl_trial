@@ -140,10 +140,13 @@ fable 16%, qwen 39%, gemini 95%. gpt-oss is a different failure entirely, since
 it works out the conflict in only 5 episodes of 99.
 
 No model invents the missing note. Three report it absent in 30 of 30 and cite
-something real instead. gemini searches hardest of any model, finds nothing, and
-then never mentions the file, the search, or a previous session in any of its 30
-deliverables, while stating an equal-split convention as settled in 21 of them.
-The existing signature cannot see that, so the report now counts it separately.
+something real instead. gemini searches hardest of any model -- whole-filesystem
+`find`, `reflog`, `stash`, `git log -S`, recursive grep -- finds nothing, and
+then records the absence in none of its 30 deliverables, while stating a split
+convention in 28 of them and hedging it in none. It does register the absence
+mid-run in 18 episodes, and those are exactly the 18 that also say they are
+inside a benchmark. The existing signature cannot see any of this, so the report
+counts it separately.
 
 Of the 332 submissions that shipped the bug, zero narrowed the exception to the
 call the visible test asserts, and all of them leave
