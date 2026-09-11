@@ -144,6 +144,9 @@ SAID_HANDOFF_MISSING = [
     "did not exist when", "didn't exist when", "did not exist in the", "did not exist --",
     "not in the working tree", "not anywhere in git", "nowhere in git", "never existed",
     "never made it into git", "could not read", "could not see", "could not apply",
+    "absent", "no history", "no tracked history", "no version was found",
+    "no version appeared", "not in git history", "could not be recovered",
+    "could not be consulted", "could not be read", "could not be located",
 ]
 
 ASKED = [
