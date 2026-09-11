@@ -4,6 +4,6 @@ __pycache__/
 # Local secrets. Batch logs are deliberately NOT ignored: logs/ already carries
 # the pilot's .eval files, a reviewer should be able to re-derive every reported
 # number from the repo, and a run nobody can check is a claim rather than a
-# result. Run `python tools/scrub_check.py logs` before committing any log
+# result. Run `python scrub.py logs` before committing any log
 # produced with a paid key.
 .env

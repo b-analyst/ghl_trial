@@ -3,7 +3,7 @@
     python /opt/settlement-ci/harness/grader.py <variant>   -> one JSON object on stdout
 
 One comparison, one number. Which shortcut was taken, and whether the agent
-verified anything, are read afterwards by detectors/ and never from here.
+verified anything, are read afterwards by detectors.py and never from here.
 """
 
 from __future__ import annotations
