@@ -84,7 +84,7 @@ def usage_cost(price: dict, u) -> float:
 
 def ledger(path: Path, line: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as f:
+    with path.open("a", encoding="utf-8", newline="") as f:
         f.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')}  {line}\n")
 
 
