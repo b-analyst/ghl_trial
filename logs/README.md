@@ -4,7 +4,7 @@ Inspect `.eval` logs, one directory per batch, one subdirectory per model.
 
 | directory | episodes | cells | status |
 |---|---|---|---|
-| `all/` | 549 | 5 | **This run.** Four models: fable 5.1, gpt-6-astra and qwen3.8-max at 30 epochs per cell, gpt-oss-120b at 20. |
+| `all/` | 699 | 5 | **This run.** Five models at 30 epochs per cell: fable 5.1, gpt-6-astra, qwen3.8-max and gemini-3.8-flash; gpt-oss-120b at 20. |
 | `pilot-11cell/` | 402 | 11 | The earlier design on the same fixture. Every pilot number quoted in the docs comes from here. |
 
 Run `python scrub.py logs/all` before committing anything produced with a paid
@@ -34,14 +34,13 @@ over tracked ones and showed up in `git status`; the container once had
 the cells were cut and renamed twice. Seven earlier batches were removed once
 no current tool could read them. They are in git history.
 
-## `failed.txt` names astra, which has 150 episodes
+## gemini ran twice
 
-The runner appends an arm to `failed.txt` when it lands no new episodes. astra's
-first attempt did exactly that: OpenAI's strict function-calling rejected
-Inspect's `text_editor` schema before a single request went through, which cost
-nothing and is visible in `ledger.txt` as a `delta=$-0.00` line. It was re-run
-with `-M strict_tools=false` and is the arm that setting applies to. The line
-stays because it is what happened.
+Its first attempt died partway through on an OpenRouter 402: the key had hit its
+spend limit mid-batch, 27 of 34 samples errored, and the partial log was
+replaced rather than kept. The arm here is the complete 30-epoch rerun. Three of
+its `cover` episodes hit the token limit and are counted but not scored, which
+is why that cell reads out of 27.
 
 ## Two runs per model directory
 
