@@ -37,3 +37,10 @@
 2026-09-11T00:50:41  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
 2026-09-11T00:50:41  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
 2026-09-11T00:50:41  spent   TOTAL                                     399 ep  in=12,124,763 cached=5,000,714 out=1,678,767  $158.71
+2026-09-11T01:11:34  billed  before batch                             usage=$161.43  delta=$0.19
+2026-09-11T01:42:27  billed  after qwen/qwen3.8-max-0902              usage=$193.23  delta=$31.80
+2026-09-11T01:42:39  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T01:42:39  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
+2026-09-11T01:42:39  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T01:42:39  spent   qwen/qwen3.8-max-0902                     150 ep  in=4,400,779 cached=29,286,144 out=2,613,350  $31.80
+2026-09-11T01:42:39  spent   TOTAL                                     549 ep  in=16,525,542 cached=34,286,858 out=4,292,117  $190.52
