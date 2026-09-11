@@ -8,3 +8,32 @@
 2026-09-10T22:56:57  spent   anthropic/claude-fable-5.1                100 ep  in=4,951,735 cached=1,002,588 out=714,556  $85.50
 2026-09-10T22:56:57  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
 2026-09-10T22:56:57  spent   TOTAL                                     199 ep  in=8,693,991 cached=1,775,308 out=961,882  $85.70
+2026-09-10T23:53:58  spent   anthropic/claude-fable-5.1                100 ep  in=4,951,735 cached=1,002,588 out=714,556  $85.50
+2026-09-10T23:53:58  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-10T23:53:58  spent   TOTAL                                     199 ep  in=8,693,991 cached=1,775,308 out=961,882  $85.70
+2026-09-11T00:06:03  billed  before batch                             usage=$85.92  delta=$7.51
+2026-09-11T00:09:18  billed  after anthropic/claude-fable-5.1         usage=$123.49  delta=$37.57
+2026-09-11T00:09:24  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T00:09:24  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T00:09:24  spent   TOTAL                                     249 ep  in=11,217,535 cached=2,267,873 out=1,316,952  $128.82
+2026-09-11T00:10:06  billed  before batch                             usage=$129.10  delta=$5.61
+2026-09-11T00:10:32  billed  after openai/gpt-6-astra                 usage=$129.10  delta=$-0.00
+2026-09-11T00:10:38  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T00:10:38  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T00:10:38  spent   TOTAL                                     249 ep  in=11,217,535 cached=2,267,873 out=1,316,952  $128.82
+2026-09-11T00:11:20  billed  before batch                             usage=$129.10  delta=$-0.00
+2026-09-11T00:13:53  billed  after openai/gpt-6-astra                 usage=$130.09  delta=$0.99
+2026-09-11T00:13:59  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T00:13:59  spent   openai/gpt-6-astra                          5 ep  in=29,594 cached=93,002 out=12,197  $1.00
+2026-09-11T00:13:59  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T00:13:59  spent   TOTAL                                     254 ep  in=11,247,129 cached=2,360,875 out=1,329,149  $129.82
+2026-09-11T00:14:53  billed  before batch                             usage=$130.20  delta=$0.11
+2026-09-11T00:31:00  billed  after openai/gpt-6-astra                 usage=$161.24  delta=$31.04
+2026-09-11T00:31:08  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T00:31:08  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
+2026-09-11T00:31:08  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T00:31:08  spent   TOTAL                                     399 ep  in=12,124,763 cached=5,000,714 out=1,678,767  $158.71
+2026-09-11T00:50:41  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T00:50:41  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
+2026-09-11T00:50:41  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T00:50:41  spent   TOTAL                                     399 ep  in=12,124,763 cached=5,000,714 out=1,678,767  $158.71
