@@ -7,6 +7,9 @@ Run the experiment: every cell, every model in models.txt, one command.
 
 -Epochs N     epochs per cell (default 20)
 -Models a,b   run only these
+-Append       add N more epochs to an arm that already has logs, instead of
+              skipping it. The new run lands as a second .eval file in the same
+              directory and report.py reads them together.
 -WhatIf       print the plan and stop. Price it with: python cost.py --epochs N
 
 Build both images first:
@@ -16,12 +19,20 @@ Build both images first:
 An arm whose logs already exist is skipped, so an interrupted batch resumes.
 #>
 [CmdletBinding()]
-param([int] $Epochs = 20, [string[]] $Models, [switch] $WhatIf)
+param([int] $Epochs = 20, [string[]] $Models, [switch] $Append, [switch] $WhatIf)
 
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 $Out = 'logs\all'
 $Python = if ($env:PYTHON) { $env:PYTHON } else { 'python' }
+
+# inspect can exit 0 having run nothing, so what landed is counted, not trusted.
+function Count-Episodes([string] $dir) {
+    [int](& $Python -c "
+import glob
+from inspect_ai.log import read_eval_log
+print(sum(1 for f in glob.glob(r'$dir/*.eval') for s in (read_eval_log(f).samples or []) if not s.error))")
+}
 
 $roster = if ($Models) { $Models } else {
     Get-Content models.txt | ForEach-Object { $_.Trim() } | Where-Object { $_ -and -not $_.StartsWith('#') }
@@ -46,9 +57,13 @@ if (-not $WhatIf) {
 
 foreach ($model in $roster) {
     $dest = Join-Path $Out ($model -replace '[/:.]', '_')
+    $before = 0
     if ((Test-Path $dest) -and (Get-ChildItem $dest -File -ErrorAction SilentlyContinue)) {
-        Write-Host "skip  $model  (logs present)" -ForegroundColor DarkYellow
-        continue
+        if (-not $Append) {
+            Write-Host "skip  $model  (logs present; -Append to add epochs)" -ForegroundColor DarkYellow
+            continue
+        }
+        if (-not $WhatIf) { $before = Count-Episodes $dest }
     }
     Write-Host "=== $model ===" -ForegroundColor Green
     if ($WhatIf) { continue }
@@ -59,21 +74,18 @@ foreach ($model in $roster) {
     & $Python -m inspect_ai eval 'adapters/inspect/inspect_task.py' `
         --model "openrouter/$model" --epochs $Epochs --log-dir $dest
 
-    # inspect can exit 0 having run nothing, so count what actually landed.
-    # Nothing at all: delete the directory so the skip above does not skip it.
-    $n = [int](& $Python -c "
-import glob
-from inspect_ai.log import read_eval_log
-print(sum(1 for f in glob.glob(r'$dest/*.eval') for s in (read_eval_log(f).samples or []) if not s.error))")
-    if ($n -eq 0) {
-        Write-Host "FAILED $model -- no episodes" -ForegroundColor Red
+    $n = Count-Episodes $dest
+    $new = $n - $before
+    if ($new -eq 0) {
+        Write-Host "FAILED $model -- no new episodes" -ForegroundColor Red
         Add-Content (Join-Path $Out 'failed.txt') $model
-        Remove-Item -Recurse -Force $dest -ErrorAction SilentlyContinue
-    } elseif ($n -lt $perModel) {
-        Write-Host "SHORT  $model -- $n of $perModel, kept" -ForegroundColor DarkYellow
+        # An empty directory would be skipped next time; one with earlier logs stays.
+        if ($before -eq 0) { Remove-Item -Recurse -Force $dest -ErrorAction SilentlyContinue }
+    } elseif ($new -lt $perModel) {
+        Write-Host "SHORT  $model -- $new of $perModel new, kept ($n total)" -ForegroundColor DarkYellow
         Add-Content (Join-Path $Out 'failed.txt') $model
     } else {
-        Write-Host "done   $model -- $n episodes" -ForegroundColor DarkGreen
+        Write-Host "done   $model -- $new new episodes, $n total" -ForegroundColor DarkGreen
     }
     & $Python cost.py --billed --note "after $model" --ledger (Join-Path $Out 'ledger.txt')
 }

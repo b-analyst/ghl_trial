@@ -3,6 +3,7 @@
 #
 #   export OPENROUTER_API_KEY=sk-or-...
 #   EPOCHS=20 sh run.sh
+#   APPEND=1 EPOCHS=10 sh run.sh     add epochs to arms that already have logs
 #
 # Build both images first:
 #   docker build -f adapters/docker/Dockerfile -t honeypot-scaffold .
@@ -13,8 +14,17 @@ set -eu
 cd "$(dirname "$0")"
 
 EPOCHS="${EPOCHS:-20}"
+APPEND="${APPEND:-}"
 OUT="logs/all"
 PY="${PYTHON:-python}"
+
+# inspect can exit 0 having run nothing, so what landed is counted, not trusted.
+count_episodes() {
+    "$PY" -c "
+import glob
+from inspect_ai.log import read_eval_log
+print(sum(1 for f in glob.glob('$1/*.eval') for s in (read_eval_log(f).samples or []) if not s.error))"
+}
 
 [ -n "${OPENROUTER_API_KEY:-}" ] || { echo "OPENROUTER_API_KEY is not set" >&2; exit 2; }
 for img in honeypot-scaffold honeypot-scaffold-noclaim; do
@@ -32,9 +42,13 @@ mkdir -p "$OUT"
 
 for model in $(grep -v '^[[:space:]]*#' models.txt | grep -v '^[[:space:]]*$'); do
     dest="$OUT/$(printf '%s' "$model" | tr '/:.' '___')"
+    before=0
     if [ -n "$(ls -A "$dest" 2>/dev/null || true)" ]; then
-        echo "skip  $model  (logs present)"
-        continue
+        if [ -z "$APPEND" ]; then
+            echo "skip  $model  (logs present; APPEND=1 to add epochs)"
+            continue
+        fi
+        before=$(count_episodes "$dest")
     fi
     echo "=== $model ==="
     mkdir -p "$dest"
@@ -43,18 +57,16 @@ for model in $(grep -v '^[[:space:]]*#' models.txt | grep -v '^[[:space:]]*$'); 
     "$PY" -m inspect_ai eval adapters/inspect/inspect_task.py \
         --model "openrouter/$model" --epochs "$EPOCHS" --log-dir "$dest" || true
 
-    # inspect can exit 0 having run nothing, so count what actually landed.
-    # Nothing at all: delete the directory so the skip above does not skip it.
-    n=$("$PY" -c "
-import glob,sys
-from inspect_ai.log import read_eval_log
-print(sum(1 for f in glob.glob('$dest/*.eval') for s in (read_eval_log(f).samples or []) if not s.error))")
-    if [ "$n" -eq 0 ]; then
-        echo "FAILED $model -- no episodes"; echo "$model" >>"$OUT/failed.txt"; rm -rf "$dest"
-    elif [ "$n" -lt "$PER_MODEL" ]; then
-        echo "SHORT  $model -- $n of $PER_MODEL, kept"; echo "$model" >>"$OUT/failed.txt"
+    n=$(count_episodes "$dest")
+    new=$((n - before))
+    if [ "$new" -eq 0 ]; then
+        echo "FAILED $model -- no new episodes"; echo "$model" >>"$OUT/failed.txt"
+        # An empty directory would be skipped next time; one with earlier logs stays.
+        [ "$before" -eq 0 ] && rm -rf "$dest"
+    elif [ "$new" -lt "$PER_MODEL" ]; then
+        echo "SHORT  $model -- $new of $PER_MODEL new, kept ($n total)"; echo "$model" >>"$OUT/failed.txt"
     else
-        echo "done   $model -- $n episodes"
+        echo "done   $model -- $new new episodes, $n total"
     fi
     "$PY" cost.py --billed --note "after $model" --ledger "$OUT/ledger.txt" || true
 done

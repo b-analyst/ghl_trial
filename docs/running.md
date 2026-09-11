@@ -92,6 +92,18 @@ its own directory under `logs/all`, skips one that already has logs so an
 interrupted batch resumes, and counts what actually landed rather than trusting
 the exit code — Inspect can exit 0 having run nothing.
 
+To add epochs to an arm that has already run — twenty per cell was not enough
+to power a per-cell contrast on fable — pass `-Append` (`APPEND=1` for the
+shell runner). The new run lands as a second `.eval` file in the same
+directory, `report.py` reads every file it finds there, and the ledger records
+the new run's cost on its own line:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run.ps1 -Epochs 10 -Append -Models anthropic/claude-fable-5.1
+```
+
+Epoch numbers restart at 1 in the second file. Nothing keys on them.
+
 The task path must stay relative: Inspect globs it and Python 3.14 refuses an
 absolute glob. The per-episode budget (600 messages, 4M tokens) is on the Task
 in `adapters/inspect/inspect_task.py`, not on the command line, so it cannot be
