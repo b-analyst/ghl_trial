@@ -60,3 +60,19 @@
 2026-09-11T13:09:18  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
 2026-09-11T13:09:18  spent   qwen/qwen3.8-max-0902                     150 ep  in=4,400,779 cached=29,286,144 out=2,613,350  $31.80
 2026-09-11T13:09:18  spent   TOTAL                                     699 ep  in=49,619,247 cached=168,295,806 out=7,549,738  $237.60
+2026-09-11T15:50:13  billed  before batch                             usage=$248.04  delta=$0.04
+2026-09-11T16:16:23  billed  after z-ai/glm-5.3                       usage=$271.53  delta=$23.49
+2026-09-11T16:16:45  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T16:16:45  spent   google/gemini-3.8-flash                   150 ep  in=33,093,705 cached=134,008,948 out=3,257,621  $47.09
+2026-09-11T16:16:45  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
+2026-09-11T16:16:45  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T16:16:45  spent   qwen/qwen3.8-max-0902                     150 ep  in=4,400,779 cached=29,286,144 out=2,613,350  $31.80
+2026-09-11T16:16:45  spent   z-ai/glm-5.3                              150 ep  in=3,844,380 cached=33,500,224 out=2,918,525  $26.93
+2026-09-11T16:16:45  spent   TOTAL                                     849 ep  in=53,463,627 cached=201,796,030 out=10,468,263  $264.54
+2026-09-11T16:19:16  spent   anthropic/claude-fable-5.1                150 ep  in=7,475,279 cached=1,495,153 out=1,069,626  $128.61
+2026-09-11T16:19:16  spent   google/gemini-3.8-flash                   150 ep  in=33,093,705 cached=134,008,948 out=3,257,621  $47.09
+2026-09-11T16:19:16  spent   openai/gpt-6-astra                        150 ep  in=907,228 cached=2,732,841 out=361,815  $29.90
+2026-09-11T16:19:16  spent   openai/gpt-oss-120b                        99 ep  in=3,742,256 cached=772,720 out=247,326  $0.21
+2026-09-11T16:19:16  spent   qwen/qwen3.8-max-0902                     150 ep  in=4,400,779 cached=29,286,144 out=2,613,350  $31.80
+2026-09-11T16:19:16  spent   z-ai/glm-5.3                              150 ep  in=3,844,380 cached=33,500,224 out=2,918,525  $26.93
+2026-09-11T16:19:16  spent   TOTAL                                     849 ep  in=53,463,627 cached=201,796,030 out=10,468,263  $264.54
