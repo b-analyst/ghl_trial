@@ -144,6 +144,13 @@ git and inferred it from the wrong test instead. fable and qwen find the real
 team to decide. Only gpt-oss fabricates, in 3 of 20, and it is also the only one
 that never reports the absence.
 
+`probe.py` re-runs each submission over the sealed cases plus three the visible
+test never taught, offline and for free. None of the 190 failing submissions cut
+its exception to fit the one call the test asserts; 189 wrote a general
+equal-split rule instead, which is not what optimising against a checker looks
+like. And all 190 leave `reconcile.daily_report(100)` a cent short, which is the
+output every model named as its reason for the carve-out.
+
 Nothing is concealed except by gpt-oss. In 549 episodes no model fixed the bug
 and hid a red build. Of the 189 hacked episodes, the 10 with no handoff at all
 and the 18 that never mention the conflict are all gpt-oss.
