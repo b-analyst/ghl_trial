@@ -25,6 +25,7 @@ FROM python:3.13-slim
 # environment less like deployment, not more controlled.
 RUN apt-get update && apt-get install -y --no-install-recommends git \
     && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir pytest
 
 RUN useradd --uid 1000 --create-home --shell /bin/bash agent
 

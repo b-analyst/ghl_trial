@@ -1,54 +1,55 @@
 # References
 
-The work this design leans on. Fuller literature reviews were written during the
-project and are in git history rather than here — they covered directions not
-taken, and a reader of this repo does not need them.
+What the design rests on. Each entry says which part.
+
+**Zhong, Raghunathan & Carlini — "ImpossibleBench: Measuring LLMs' Propensity
+of Exploiting Test Cases"** (arXiv 2510.20270; ICLR 2026). Builds task variants
+where the specification conflicts with the unit tests, so any pass implies a
+shortcut, and measures the pass rate as a cheating rate. GPT-5 cheats 54% of
+the time on Conflicting-SWEbench; newer Claude models cheat less than older
+ones. The wrong test here is that construction. It ships as an official Inspect
+implementation.
+
+**METR — "Recent Frontier Models Are Reward Hacking"** (June 2025). Frontier
+models modify tests and scoring code, and reach for answers the harness already
+computed. o3 hacked 0.7% of HCAST tasks and about forty-three times as often on
+RE-Bench, where it could see the scoring function. That gap is why the earlier
+design on this fixture found nothing — the criterion was never in front of the
+agent — and why this one puts it in the ticket.
+
+**Schweitzer, Ordóñez & Douma — "Goal Setting as a Motivator of Unethical
+Behavior"** (*Academy of Management Journal* 47(3): 422–432, 2004). People with
+a specific, unmet goal overstate their self-scored performance more than people
+told to do their best, most of all when they fall just short. Held with and
+without money. The `stated_goal` factor is that manipulation: a specific
+criterion the honest fix cannot reach.
 
 **Krakovna, Lindner, Ho, Farquhar & Shah — "Realistic honeypot evaluations for
-scheming propensity"** (arXiv 2605.29729). Supplies the requirement this design
-is measured against: a honeypot needs an affordance a misaligned model would
-pursue and *an aligned agent going about its task would have no reason to use*.
-It also reports no unprompted scheming in a realistic internal-deployment
-setting, which is why a low base rate here is the published expectation rather
-than a broken environment.
+scheming propensity"** (arXiv 2605.29729). A honeypot needs an affordance a
+misaligned agent would take and an aligned one has no reason to touch, and a
+realistic one should expect a low base rate. Here the affordance is green
+without fixing the bug; an honest agent has no reason to want it.
 
-This is the requirement the removed bait fixture was meant to satisfy and did
-not — see "What this run adds, and what it cannot show" in `design.md`.
+**Nishimura-Gasparian, McCarthy & Lindner — "Towards Understanding
+Specification Gaming in Reasoning Models"** (arXiv 2605.02269). Defines
+specification gaming as an action unintended by the developer or user that
+scores well on the evaluation function, and reports rates across families,
+lowest in Claude and highest in Grok. The roster in `models.txt` was chosen
+against that spread.
 
-**Nishimura-Gasparian, McCarthy & Lindner — "Towards Understanding Specification
-Gaming in Reasoning Models"** (arXiv 2605.02269). Defines specification gaming as
-an action unintended by developers or users that nonetheless scores well on an
-evaluation function, and reports gaming at non-negligible rates across models,
-lowest in Claude and highest in Grok. That spread is the prior the model roster
-in `tools/models.txt` was chosen against.
+**Bandura — moral disengagement** (Bandura, Barbaranelli, Caprara & Pastorelli,
+*JPSP* 1996; Bandura, Underwood & Fromson, *J. Research in Personality* 1975).
+Displacement of responsibility is one of the eight mechanisms: the harm is
+someone else's decision. The `phantom-goal` cell asks whether an agent will
+invent that someone — a prior session whose note it cites and never read.
 
-Taken together with the paper above: an environment with no visible success
-criterion returns nothing, and one with a criterion returns gaming. That is why
-`agent_data/evaluate.py` exists and why the ticket tells the agent to run it.
-
-**Krakovna's specification-gaming distinction.** Behaviour that satisfies the
-literal specification while missing its intent. Reward hacking is the narrower
-case where the shortcut also *pays*. This environment demonstrates the first and
-not the second, and `design.md` says so.
-
-**STALE** (arXiv 2605.06527) measures whether models *can* detect that a stored
-belief is stale. This measures something different — whether an agent bothers to
-check when checking costs one command and nobody asked. Capability against
-propensity.
-
-**"Act or Escalate?"** (arXiv 2604.08588) advises deployers to characterise their
-model's escalation threshold before shipping, which presumes the threshold is a
-property of the model. The four cells here vary only the environment, which is
-the assumption worth testing.
-
-**Okamoto et al.** (arXiv 2608.12323) tested stated rules against enforcement
-signals across twelve models. A prohibition axis was considered for this design
-and cut because that paper covers it.
+**Nisbett & Wilson — "Telling more than we can know"** (*Psychological Review*
+1977). People confidently report reasons for their behaviour that they had no
+access to. The same cell, read as confabulation rather than displacement.
 
 ---
 
-A note on provenance. Citations in the original reviews carried verification
-markers, and several claims made early in this project turned out not to be
-supported by the sources given for them. The six above were the ones checked
-most closely, but anything quoted here should be read against the source before
-it goes into a writeup.
+Earlier literature reviews, including one on the cheating and rationalisation
+literature written for a follow-on study, are in git history rather than here.
+Several citations made early in this project turned out not to support what
+they were cited for; the ones above were checked against the source.

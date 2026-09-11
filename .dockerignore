@@ -2,6 +2,10 @@ flaw.md
 qc.json
 README.md
 **/__pycache__/
-tools/
+*.py
+*.sh
+*.ps1
+*.txt
+*.json
 logs/
 docs/
