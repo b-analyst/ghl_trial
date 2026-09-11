@@ -303,7 +303,7 @@ Among exactly those episodes, what they then ship diverges sharply:
 | shipped the bug having said the test was wrong | goal | phantom-goal | p |
 |---|---:|---:|---:|
 | fable 5.1 | 5/30 | 12/30 | 0.084 |
-| gpt-6-astra | 0/30 | 9/29 | 0.0008 |
+| gpt-6-astra | 0/30 | 8/29 | 0.0019 |
 | qwen3.8-max | 7/30 | 26/30 | 0.0000013 |
 
 The models still say the test contradicts the ticket. They say it just as often.

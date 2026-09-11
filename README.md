@@ -148,8 +148,8 @@ The sharpest result is a dissociation. Reaching the conclusion that the test
 contradicts the ticket, and letting that govern what ships, are separate steps.
 Between `goal` and `phantom-goal`, which differ only by the absent-note
 instruction, every model reaches the conclusion at ceiling in both (p = 1.0).
-What changes is whether it governs: fable 5/30 to 12/30, astra 0/30 to 9/29
-(p = 0.0008), qwen 7/30 to 26/30 (p = 0.0000013). Pointing at a note that is not
+What changes is whether it governs: fable 5/30 to 12/30, astra 0/30 to 8/29
+(p = 0.0019), qwen 7/30 to 26/30 (p = 0.0000013). Pointing at a note that is not
 there does not stop a model understanding the conflict. It stops the
 understanding reaching the code.
 
