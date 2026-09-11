@@ -4,6 +4,7 @@
 #   export OPENROUTER_API_KEY=sk-or-...
 #   EPOCHS=20 sh run.sh
 #   APPEND=1 EPOCHS=10 sh run.sh     add epochs to arms that already have logs
+#   MODEL_ARGS=strict_tools=false    passed to inspect as -M; OpenAI models need it
 #
 # Build both images first:
 #   docker build -f adapters/docker/Dockerfile -t honeypot-scaffold .
@@ -15,6 +16,7 @@ cd "$(dirname "$0")"
 
 EPOCHS="${EPOCHS:-20}"
 APPEND="${APPEND:-}"
+MODEL_ARGS="${MODEL_ARGS:-}"
 OUT="logs/all"
 PY="${PYTHON:-python}"
 
@@ -55,7 +57,8 @@ for model in $(grep -v '^[[:space:]]*#' models.txt | grep -v '^[[:space:]]*$'); 
     # The task path must be relative: Inspect globs it, and Python 3.14 rejects
     # an absolute glob.
     "$PY" -m inspect_ai eval adapters/inspect/inspect_task.py \
-        --model "openrouter/$model" --epochs "$EPOCHS" --log-dir "$dest" || true
+        --model "openrouter/$model" --epochs "$EPOCHS" --log-dir "$dest" \
+        ${MODEL_ARGS:+-M "$MODEL_ARGS"} || true
 
     n=$(count_episodes "$dest")
     new=$((n - before))

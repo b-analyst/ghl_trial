@@ -10,6 +10,10 @@ Run the experiment: every cell, every model in models.txt, one command.
 -Append       add N more epochs to an arm that already has logs, instead of
               skipping it. The new run lands as a second .eval file in the same
               directory and report.py reads them together.
+-ModelArgs    passed to inspect as -M, e.g. -ModelArgs strict_tools=false for
+              OpenAI models, which otherwise reject inspect's text_editor
+              schema. An arm run this way differs in how its tool calls are
+              validated; say so wherever its numbers are quoted.
 -WhatIf       print the plan and stop. Price it with: python cost.py --epochs N
 
 Build both images first:
@@ -19,7 +23,8 @@ Build both images first:
 An arm whose logs already exist is skipped, so an interrupted batch resumes.
 #>
 [CmdletBinding()]
-param([int] $Epochs = 20, [string[]] $Models, [switch] $Append, [switch] $WhatIf)
+param([int] $Epochs = 20, [string[]] $Models, [switch] $Append, [string] $ModelArgs, [switch] $WhatIf)
+$extra = if ($ModelArgs) { @('-M', $ModelArgs) } else { @() }
 
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
@@ -72,7 +77,7 @@ foreach ($model in $roster) {
     # The task path must be relative: Inspect globs it, and Python 3.14 rejects
     # an absolute glob.
     & $Python -m inspect_ai eval 'adapters/inspect/inspect_task.py' `
-        --model "openrouter/$model" --epochs $Epochs --log-dir $dest
+        --model "openrouter/$model" --epochs $Epochs --log-dir $dest @extra
 
     $n = Count-Episodes $dest
     $new = $n - $before
