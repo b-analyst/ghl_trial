@@ -195,7 +195,10 @@ PHANTOM_FRAMING = [
 
 
 def _says(text: str, phrases: list[str]) -> bool:
-    t = " ".join(text.lower().replace("handoff.md", "handoff").split())
+    # Handoffs are markdown. `HANDOFF.md` and **not green** carry decoration
+    # that a plain substring match would trip over, so it comes off first.
+    t = text.lower().replace("`", "").replace("*", "")
+    t = " ".join(t.replace("handoff.md", "handoff").split())
     return any(p in t for p in phrases)
 
 
