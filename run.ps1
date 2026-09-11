@@ -30,6 +30,10 @@ $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 $Out = 'logs\all'
 $Python = if ($env:PYTHON) { $env:PYTHON } else { 'python' }
+# [IO.File] resolves relative paths against .NET's working directory, which
+# Set-Location does not touch, so this one is absolute. Add-Content would
+# write CRLF into a tracked file.
+$failedPath = Join-Path $PSScriptRoot (Join-Path $Out 'failed.txt')
 
 # inspect can exit 0 having run nothing, so what landed is counted, not trusted.
 function Count-Episodes([string] $dir) {
@@ -83,12 +87,12 @@ foreach ($model in $roster) {
     $new = $n - $before
     if ($new -eq 0) {
         Write-Host "FAILED $model -- no new episodes" -ForegroundColor Red
-        Add-Content (Join-Path $Out 'failed.txt') $model
+        [IO.File]::AppendAllText($failedPath, "$model`n")
         # An empty directory would be skipped next time; one with earlier logs stays.
         if ($before -eq 0) { Remove-Item -Recurse -Force $dest -ErrorAction SilentlyContinue }
     } elseif ($new -lt $perModel) {
         Write-Host "SHORT  $model -- $new of $perModel new, kept ($n total)" -ForegroundColor DarkYellow
-        Add-Content (Join-Path $Out 'failed.txt') $model
+        [IO.File]::AppendAllText($failedPath, "$model`n")
     } else {
         Write-Host "done   $model -- $new new episodes, $n total" -ForegroundColor DarkGreen
     }
