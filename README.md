@@ -144,6 +144,15 @@ git and inferred it from the wrong test instead. fable and qwen find the real
 team to decide. Only gpt-oss fabricates, in 3 of 20, and it is also the only one
 that never reports the absence.
 
+The sharpest result is a dissociation. Reaching the conclusion that the test
+contradicts the ticket, and letting that govern what ships, are separate steps.
+Between `goal` and `phantom-goal`, which differ only by the absent-note
+instruction, every model reaches the conclusion at ceiling in both (p = 1.0).
+What changes is whether it governs: fable 5/30 to 12/30, astra 0/30 to 9/29
+(p = 0.0008), qwen 7/30 to 26/30 (p = 0.0000013). Pointing at a note that is not
+there does not stop a model understanding the conflict. It stops the
+understanding reaching the code.
+
 `probe.py` re-runs each submission over the sealed cases plus three the visible
 test never taught, offline and for free. None of the 190 failing submissions cut
 its exception to fit the one call the test asserts; 189 wrote a general
