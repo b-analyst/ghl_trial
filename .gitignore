@@ -7,3 +7,6 @@ __pycache__/
 # result. Run `python scrub.py logs` before committing any log
 # produced with a paid key.
 .env
+
+# Derived from logs/ by analysis.ipynb, which rebuilds it when absent.
+episodes.csv
