@@ -27,6 +27,11 @@ Dockerfile      text eol=lf
 *.yaml          text eol=lf
 *.txt           text eol=lf
 
+# A notebook is JSON, but the extension does not say so, and a checkout that
+# rewrites it changes every line of the diff whenever a cell is run.
+*.ipynb         text eol=lf
+.gitignore      text eol=lf
+
 *.log           text eol=lf
 
 # Windows batch files are the one thing that genuinely wants CRLF.
