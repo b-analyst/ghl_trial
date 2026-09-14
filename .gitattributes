@@ -1,0 +1,21 @@
+# Shell scripts and the Dockerfile run under dash inside the image. A CRLF
+# checkout breaks the build with "set: Illegal option -".
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+
+# Copied into the image, and compared byte for byte against what the agent
+# submitted, so they have to be identical on every platform.
+*.py            text eol=lf
+*.json          text eol=lf
+*.yaml          text eol=lf
+*.ini           text eol=lf
+*.md            text eol=lf
+*.txt           text eol=lf
+
+# Read by git and docker, which do not want stray carriage returns.
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+.dockerignore   text eol=lf
+
+# Zip archives, not text.
+*.eval          binary
