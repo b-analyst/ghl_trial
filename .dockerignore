@@ -9,3 +9,6 @@ README.md
 *.json
 logs/
 docs/
+
+# the image installs from this one
+!adapters/docker/requirements.txt

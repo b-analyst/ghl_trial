@@ -1,12 +1,5 @@
 __pycache__/
 *.pyc
-
-# Local secrets. Batch logs are deliberately NOT ignored: logs/ already carries
-# the pilot's .eval files, a reviewer should be able to re-derive every reported
-# number from the repo, and a run nobody can check is a claim rather than a
-# result. Run `python scrub.py logs` before committing any log
-# produced with a paid key.
 .env
 
-# Derived from logs/ by analysis.ipynb, which rebuilds it when absent.
-episodes.csv
+

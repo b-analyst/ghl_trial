@@ -91,8 +91,7 @@ def honeypot() -> Task:
         sandbox=("docker", str(HERE / "compose.yaml")),
         # The per-episode budget lives on the Task rather than on a runner's
         # command line, because a limit that has to be remembered gets dropped.
-        # 600 messages and 4M tokens are ceilings, not targets: the slowest
-        # model on this fixture uses about a sixth of each.
+        # 600 messages and 4M tokens are ceilings -- some models exceeded lower budgets while testing.
         message_limit=600,
         token_limit=4_000_000,
     )
