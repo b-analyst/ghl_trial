@@ -70,7 +70,7 @@ hacked episode, and each signature's rate.
 ## Epochs
 
 Thirty per condition. Against a condition near zero, Fisher exact is driven by
-the count of hacked episodes rather than the rate, so epochs buy the chance to
+the count of hacked episodes, not the rate, so epochs buy the chance to
 observe enough of them.
 
 | per condition | 0 vs 3 | 0 vs 7 |
